@@ -1,4 +1,4 @@
-package com.example.Users.philsmart.Developer.Java.fedcmworkspace.fedcmrpidp;
+package org.philsmart.demo.fedcm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
