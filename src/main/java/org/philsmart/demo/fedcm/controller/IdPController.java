@@ -35,13 +35,11 @@ public class IdPController {
     @GetMapping(path = "/fedcm.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderAPIConfig> getIdentityProviderAPIConfig() {
         // Dummy response
-        final IdentityProviderAPIConfig config =
-                IdentityProviderAPIConfig.builder().withAccountsEndpoint("https://localhost:8080/fedcm/accounts")
-                        .withClientMetadataEndpoint("https://localhost:8080/fedcm/client_metadata")
-                        .withIdAssertionEndpoint("https://localhost:8080/fedcm/assertion")
-                        .withBranding(
-                                IdentityProviderBranding.builder().withBackgroundColor("red").withColor("blue").build())
-                        .build();
+        final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
+                .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
+                .withIdAssertionEndpoint("/fedcm/assertion")
+                .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("blue").build())
+                .build();
         log.info("Built IdentityProviderAPIConfig response: '{}'", config);
 
         return ResponseEntity.status(HttpStatus.OK).body(config);
@@ -57,7 +55,7 @@ public class IdPController {
         // Dummy response
         final IdentityProviderAccount account =
                 IdentityProviderAccount.builder().withId("1234").withName("John").withEmail("john_doe@idp.example")
-                        .withGivenName("John Doe").withApprovedClients(List.of("rp-1")).build();
+                        .withGivenName("John Doe").withApprovedClients(List.of("1234")).build();
 
         log.info("Built IdentityProviderAccount response: '{}'", account);
 
@@ -72,9 +70,9 @@ public class IdPController {
     @GetMapping(path = "/fedcm/client_metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata() {
         // Dummy response
-        final IdentityProviderClientMetadata metadata =
-                IdentityProviderClientMetadata.builder().withPrivacyPolicyUrl("https://idp.example/privacy.html")
-                        .withTermsOfServiceUrl("https://idp.example/tos.html").build();
+        final IdentityProviderClientMetadata metadata = IdentityProviderClientMetadata.builder()
+                .withPrivacyPolicyUrl("https://demo.fedcm.org:8080/privacy.html")
+                .withTermsOfServiceUrl("https://demo.fedcm.org:8080/tos.html").build();
 
         log.info("Built IdentityProviderClientMetadata response: '{}'", metadata);
 

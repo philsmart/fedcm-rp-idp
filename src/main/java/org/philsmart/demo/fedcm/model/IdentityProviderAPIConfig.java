@@ -1,6 +1,8 @@
 
 package org.philsmart.demo.fedcm.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 /**
  * The IdP's fedCM manifest
  *
@@ -32,6 +34,7 @@ public class IdentityProviderAPIConfig {
     /**
      * @return the accountsEndpoint
      */
+    @JsonGetter("accounts_endpoint")
     public final String getAccountsEndpoint() {
         return accountsEndpoint;
     }
@@ -39,6 +42,7 @@ public class IdentityProviderAPIConfig {
     /**
      * @return the clientMetadataEndpoint
      */
+    @JsonGetter("client_metadata_endpoint")
     public final String getClientMetadataEndpoint() {
         return clientMetadataEndpoint;
     }
@@ -46,6 +50,7 @@ public class IdentityProviderAPIConfig {
     /**
      * @return the idAssertionEndpoint
      */
+    @JsonGetter("id_assertion_endpoint")
     public final String getIdAssertionEndpoint() {
         return idAssertionEndpoint;
     }
@@ -53,6 +58,7 @@ public class IdentityProviderAPIConfig {
     /**
      * @return the branding
      */
+    @JsonGetter("branding")
     public final IdentityProviderBranding getBranding() {
         return branding;
     }

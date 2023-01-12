@@ -16,9 +16,9 @@ async function login() {
 
     // In this example, https://idp.example is the IdP's URL.
     var idToken = await navigator.credentials.get({
-      federated: {
+      identity: {
         providers: [{
-          url: "https://localhost:8081", // IdP domain
+          configURL: "https://demo.fedcm.org:8080/fedcm.json", // IdP domain
           clientId: "1234", // Client ID of the RP
           nonce: "5678", // Nonce (random value)
         }]

@@ -1,6 +1,8 @@
 
 package org.philsmart.demo.fedcm.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 /**
  * FedCM manifest identity provider branding.
  *
@@ -19,6 +21,7 @@ public class IdentityProviderBranding {
     /**
      * @return the backgroundColor
      */
+    @JsonGetter("background_color")
     public final String getBackgroundColor() {
         return backgroundColor;
     }
@@ -26,6 +29,7 @@ public class IdentityProviderBranding {
     /**
      * @return the color
      */
+    @JsonGetter("color")
     public final String getColor() {
         return color;
     }

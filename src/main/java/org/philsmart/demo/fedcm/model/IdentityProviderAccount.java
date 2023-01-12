@@ -4,6 +4,8 @@ package org.philsmart.demo.fedcm.model;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 public class IdentityProviderAccount {
 
     private final String id;
@@ -26,6 +28,7 @@ public class IdentityProviderAccount {
     /**
      * @return the id
      */
+    @JsonGetter("id")
     public final String getId() {
         return id;
     }
@@ -33,6 +36,7 @@ public class IdentityProviderAccount {
     /**
      * @return the name
      */
+    @JsonGetter("name")
     public final String getName() {
         return name;
     }
@@ -40,6 +44,7 @@ public class IdentityProviderAccount {
     /**
      * @return the email
      */
+    @JsonGetter("email")
     public final String getEmail() {
         return email;
     }
@@ -47,6 +52,7 @@ public class IdentityProviderAccount {
     /**
      * @return the givenName
      */
+    @JsonGetter("given_name")
     public final String getGivenName() {
         return givenName;
     }
@@ -54,6 +60,7 @@ public class IdentityProviderAccount {
     /**
      * @return the approvedClients
      */
+    @JsonGetter("approved_clients")
     public final List<String> getApprovedClients() {
         return approvedClients;
     }

@@ -1,6 +1,8 @@
 
 package org.philsmart.demo.fedcm.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 public class IdentityProviderClientMetadata {
 
     private final String privacyPolicyUrl;
@@ -21,6 +23,7 @@ public class IdentityProviderClientMetadata {
     /**
      * @return the privacyPolicyUrl
      */
+    @JsonGetter("privacy_policy_url")
     public final String getPrivacyPolicyUrl() {
         return privacyPolicyUrl;
     }
@@ -28,6 +31,7 @@ public class IdentityProviderClientMetadata {
     /**
      * @return the termsOfServiceUrl
      */
+    @JsonGetter("terms_of_service_url")
     public final String getTermsOfServiceUrl() {
         return termsOfServiceUrl;
     }
