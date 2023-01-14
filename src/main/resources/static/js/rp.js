@@ -18,14 +18,14 @@ async function login() {
     var idToken = await navigator.credentials.get({
       identity: {
         providers: [{
-          configURL: "https://demo.fedcm.org:8080/fedcm.json", // IdP domain
-          clientId: "1234", // Client ID of the RP
+          configURL: "https://fedcm-demo.org/fedcm.json", // IdP domain
+          clientId: "https://fedcm-demo.org/", // Client ID of the RP
           nonce: "5678", // Nonce (random value)
         }]
       }
     });
 
-    console.log(`received token: ${idToken}`);
+    console.log(`received token: ${idToken.token}`);
   } catch (e) {
     console.log(`rejected with ${e}`);
   }

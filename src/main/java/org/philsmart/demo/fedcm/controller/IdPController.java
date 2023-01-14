@@ -9,6 +9,7 @@ import org.philsmart.demo.fedcm.model.IdentityProviderAccounts;
 import org.philsmart.demo.fedcm.model.IdentityProviderBranding;
 import org.philsmart.demo.fedcm.model.IdentityProviderClientMetadata;
 import org.philsmart.demo.fedcm.model.IdentityProviderToken;
+import org.philsmart.demo.fedcm.model.IdentityProviderWellKnown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,12 +29,12 @@ public class IdPController {
     private static final Logger log = LoggerFactory.getLogger(IdPController.class);
 
     /**
-     * Endpoint to fetch the API config for this IdP.
+     * Endpoint to fetch the manifest that holds the API config for this IdP.
      * 
      * @return the API config.
      */
     @GetMapping(path = "/fedcm.json", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderAPIConfig> getIdentityProviderAPIConfig() {
+    public ResponseEntity<IdentityProviderAPIConfig> getManifest() {
         // Dummy response
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
                 .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
@@ -63,7 +64,7 @@ public class IdPController {
     }
 
     /**
-     * Open endpoint for returning client metadata?
+     * Endpoint for returning client metadata?
      * 
      * @return the IdP's client metadata
      */
@@ -71,8 +72,8 @@ public class IdPController {
     public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata() {
         // Dummy response
         final IdentityProviderClientMetadata metadata = IdentityProviderClientMetadata.builder()
-                .withPrivacyPolicyUrl("https://demo.fedcm.org:8080/privacy.html")
-                .withTermsOfServiceUrl("https://demo.fedcm.org:8080/tos.html").build();
+                .withPrivacyPolicyUrl("https://fedcm-demo.org/privacy.html")
+                .withTermsOfServiceUrl("https://fedcm-demo.org/tos.html").build();
 
         log.info("Built IdentityProviderClientMetadata response: '{}'", metadata);
 
@@ -80,7 +81,7 @@ public class IdPController {
     }
 
     /**
-     * Identity assertion endpoint
+     * Identity assertion/token endpoint.
      * 
      * @return a dummy assertion for now
      */
@@ -90,8 +91,24 @@ public class IdPController {
         final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
                 + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-
-        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderToken(dummyJWT));
+        final IdentityProviderToken token = new IdentityProviderToken(dummyJWT);
+        
+        log.info("Built IdentityProviderToken: '{}'", token);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
+    
+    /**
+     * Get the well-known webidentity of this IdP. Which points to the server manifests. 
+     * See {@link #getManifest()}.
+     * 
+     * @return the IdentityProviderWellKnown JSON
+     */
+    @GetMapping(path = ".well-known/web-identity", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<IdentityProviderWellKnown> getWebIdentity() {
+        // Dummy response
+        IdentityProviderWellKnown wellKnown = new IdentityProviderWellKnown(List.of("/fedcm.json"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(wellKnown);
+    } 
 
 }

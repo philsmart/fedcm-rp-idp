@@ -15,8 +15,15 @@ public class IdentityProviderToken {
     public IdentityProviderToken(final String theToken) {
         token = Objects.requireNonNull(theToken, "The Token can not be null");
     }
+    
 
-    @JsonGetter("token")
+    @Override
+	public String toString() {
+		return "IdentityProviderToken [token=" + token + "]";
+	}
+
+
+	@JsonGetter("token")
     public String getToken() {
         return token;
     }
