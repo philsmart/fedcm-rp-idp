@@ -8,6 +8,7 @@ import org.philsmart.demo.fedcm.model.IdentityProviderAccount;
 import org.philsmart.demo.fedcm.model.IdentityProviderAccounts;
 import org.philsmart.demo.fedcm.model.IdentityProviderBranding;
 import org.philsmart.demo.fedcm.model.IdentityProviderClientMetadata;
+import org.philsmart.demo.fedcm.model.IdentityProviderIcon;
 import org.philsmart.demo.fedcm.model.IdentityProviderToken;
 import org.philsmart.demo.fedcm.model.IdentityProviderWellKnown;
 import org.slf4j.Logger;
@@ -39,7 +40,9 @@ public class IdPController {
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
                 .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
                 .withIdAssertionEndpoint("/fedcm/assertion")
-                .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("blue").build())
+                .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
+                		.withIcons(List.of(IdentityProviderIcon.builder().withUrl("https://fedcm-demo.org/images/logo.ico")
+                				.withSize(50).build())).build())
                 .build();
         log.info("Built IdentityProviderAPIConfig response: '{}'", config);
 
@@ -55,8 +58,9 @@ public class IdPController {
     public ResponseEntity<IdentityProviderAccounts> getAccounts() {
         // Dummy response
         final IdentityProviderAccount account =
-                IdentityProviderAccount.builder().withId("1234").withName("John").withEmail("john_doe@idp.example")
-                        .withGivenName("John Doe").withApprovedClients(List.of("1234")).build();
+                IdentityProviderAccount.builder().withId("1234").withName("James Kirk").withEmail("james.kirk@idp.example")
+                        .withGivenName("James").withApprovedClients(List.of("1234"))
+                        .withPicture("https://fedcm-demo.org/images/kirk.ico").build();
 
         log.info("Built IdentityProviderAccount response: '{}'", account);
 

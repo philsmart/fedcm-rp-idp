@@ -8,143 +8,156 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 
 public class IdentityProviderAccount {
 
-    private final String id;
+	private final String id;
 
-    private final String name;
+	private final String name;
 
-    private final String email;
+	private final String email;
 
-    /** Optional. */
-    private final String givenName;
+	/** Optional. */
+	private final String givenName;
 
-    private final List<String> approvedClients;
+	private final List<String> approvedClients;
 
-    @Override
-    public String toString() {
-        return "IdentityProviderAccount [id=" + id + ", name=" + name + ", email=" + email + ", givenName=" + givenName
-                + ", approvedClients=" + approvedClients + "]";
-    }
+	private final String picture;
 
-    /**
-     * @return the id
-     */
-    @JsonGetter("id")
-    public final String getId() {
-        return id;
-    }
+	private IdentityProviderAccount(Builder builder) {
+		this.id = builder.id;
+		this.name = builder.name;
+		this.email = builder.email;
+		this.givenName = builder.givenName;
+		this.approvedClients = builder.approvedClients;
+		this.picture = builder.picture;
+	}
 
-    /**
-     * @return the name
-     */
-    @JsonGetter("name")
-    public final String getName() {
-        return name;
-    }
+	@Override
+	public String toString() {
+		return "IdentityProviderAccount [id=" + id + ", name=" + name + ", email=" + email + ", givenName=" + givenName
+				+ ", approvedClients=" + approvedClients + "]";
+	}
 
-    /**
-     * @return the email
-     */
-    @JsonGetter("email")
-    public final String getEmail() {
-        return email;
-    }
+	/**
+	 * @return the id
+	 */
+	@JsonGetter("id")
+	public final String getId() {
+		return id;
+	}
 
-    /**
-     * @return the givenName
-     */
-    @JsonGetter("given_name")
-    public final String getGivenName() {
-        return givenName;
-    }
+	/**
+	 * @return the name
+	 */
+	@JsonGetter("name")
+	public final String getName() {
+		return name;
+	}
 
-    /**
-     * @return the approvedClients
-     */
-    @JsonGetter("approved_clients")
-    public final List<String> getApprovedClients() {
-        return approvedClients;
-    }
+	/**
+	 * @return the email
+	 */
+	@JsonGetter("email")
+	public final String getEmail() {
+		return email;
+	}
 
-    private IdentityProviderAccount(final Builder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-        this.email = builder.email;
-        this.givenName = builder.givenName;
-        this.approvedClients = builder.approvedClients;
-    }
+	/**
+	 * @return the givenName
+	 */
+	@JsonGetter("given_name")
+	public final String getGivenName() {
+		return givenName;
+	}
 
-    public static IIdStage builder() {
-        return new Builder();
-    }
+	/**
+	 * @return the approvedClients
+	 */
+	@JsonGetter("approved_clients")
+	public final List<String> getApprovedClients() {
+		return approvedClients;
+	}
+	
+	@JsonGetter("picture")
+	public final String getPicture() {
+		return picture;
+	}
 
-    public interface IIdStage {
-        public INameStage withId(String id);
-    }
+	public static IIdStage builder() {
+		return new Builder();
+	}
 
-    public interface INameStage {
-        public IEmailStage withName(String name);
-    }
+	public interface IIdStage {
+		public INameStage withId(String id);
+	}
 
-    public interface IEmailStage {
-        public IBuildStage withEmail(String email);
-    }
+	public interface INameStage {
+		public IEmailStage withName(String name);
+	}
 
-    public interface IBuildStage {
-        public IBuildStage withGivenName(String givenName);
+	public interface IEmailStage {
+		public IBuildStage withEmail(String email);
+	}
 
-        public IBuildStage withApprovedClients(List<String> approvedClients);
+	public interface IBuildStage {
+		public IBuildStage withGivenName(String givenName);
 
-        public IdentityProviderAccount build();
-    }
+		public IBuildStage withApprovedClients(List<String> approvedClients);
 
-    public static final class Builder implements IIdStage, INameStage, IEmailStage, IBuildStage {
-        private String id;
+		public IBuildStage withPicture(String picture);
 
-        private String name;
+		public IdentityProviderAccount build();
+	}
 
-        private String email;
+	public static final class Builder implements IIdStage, INameStage, IEmailStage, IBuildStage {
+		private String id;
+		private String name;
+		private String email;
+		private String givenName;
+		private List<String> approvedClients = Collections.emptyList();
+		private String picture;
 
-        private String givenName;
+		private Builder() {
+		}
 
-        private List<String> approvedClients = Collections.emptyList();
+		@Override
+		public INameStage withId(String id) {
+			this.id = id;
+			return this;
+		}
 
-        private Builder() {
-        }
+		@Override
+		public IEmailStage withName(String name) {
+			this.name = name;
+			return this;
+		}
 
-        @Override
-        public INameStage withId(final String id) {
-            this.id = id;
-            return this;
-        }
+		@Override
+		public IBuildStage withEmail(String email) {
+			this.email = email;
+			return this;
+		}
 
-        @Override
-        public IEmailStage withName(final String name) {
-            this.name = name;
-            return this;
-        }
+		@Override
+		public IBuildStage withGivenName(String givenName) {
+			this.givenName = givenName;
+			return this;
+		}
 
-        @Override
-        public IBuildStage withEmail(final String email) {
-            this.email = email;
-            return this;
-        }
+		@Override
+		public IBuildStage withApprovedClients(List<String> approvedClients) {
+			this.approvedClients = approvedClients;
+			return this;
+		}
 
-        @Override
-        public IBuildStage withGivenName(final String givenName) {
-            this.givenName = givenName;
-            return this;
-        }
+		@Override
+		public IBuildStage withPicture(String picture) {
+			this.picture = picture;
+			return this;
+		}
 
-        @Override
-        public IBuildStage withApprovedClients(final List<String> approvedClients) {
-            this.approvedClients = approvedClients;
-            return this;
-        }
-
-        @Override
-        public IdentityProviderAccount build() {
-            return new IdentityProviderAccount(this);
-        }
-    }
+		@Override
+		public IdentityProviderAccount build() {
+			return new IdentityProviderAccount(this);
+		}
+	}
 
 }

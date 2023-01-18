@@ -5,14 +5,43 @@
 <title>Relying Party FedCM Demo</title>
 <script src="js/rp.js" async></script>
 </head>
-<body>
+<body style="margin: 10px">
 
-<h1>Relying Party Demo</h1>
+	<div style="text-align: center">
+		<h1>Relying Party FedCM Demo</h1>
+		<h3>
+			See the FedCM <a href="https://fedidcg.github.io/FedCM/">Sepcification</a>
+		</h3>
+	</div>
 
-<hr/>
+	<div
+		style="width: 80%; margin-left: 10%; margin-right: 10%; border: 1px SOLID; border-radius: 10px; padding: 10px">
+		<h4 style="text-align: center">FedCM Login Steps
+			(navigator.credentials.get())</h4>
+		<ol>
+			<li>GET Request to the well-known web identity file:<a
+				href=".well-known/web-identity">.well-known/web-identity</a></li>
+			<li>GET Request to the config endpoint: <a href="fedcm.json">fedcm.json</a></li>
+			<li>GET Request to the accounts endpoint: <a
+				href="fedcm/accounts">fedcm/accounts</a></li>
+			<li>GET Request to the metadata endpoint: <a
+				href="fedcm/client_metadata">fedcm/client_metadata</a></li>
+			<li>POST Request to the assertion endpoint: fedcm/assertion</li>
+		</ol>
 
-<button onclick="login()">Login (FedCM)</button>
+		<div style="text-align: center">
+			<button onclick="login()">Login (FedCM)</button>
+		</div>
+	</div>
 
+
+
+	<div
+		style="width: 80%; margin-top:10px; margin-left: 10%; margin-right: 10%; border: 1px SOLID; border-radius: 10px; padding: 10px">
+		<h4 style="text-align: center">Token Response</h4>
+
+		<textArea id="token" style="width: 100%"></textArea>
+	</div>
 
 </body>
 </html>

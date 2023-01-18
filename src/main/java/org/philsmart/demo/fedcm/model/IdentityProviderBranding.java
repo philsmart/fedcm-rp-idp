@@ -1,6 +1,9 @@
 
 package org.philsmart.demo.fedcm.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
@@ -9,72 +12,77 @@ import com.fasterxml.jackson.annotation.JsonGetter;
  */
 public class IdentityProviderBranding {
 
-    private final String backgroundColor;
+	private final String backgroundColor;
 
-    private final String color;
+	private final String color;
 
-    private IdentityProviderBranding(final Builder builder) {
-        this.backgroundColor = builder.backgroundColor;
-        this.color = builder.color;
-    }
+	private final List<IdentityProviderIcon> icons;
 
-    /**
-     * @return the backgroundColor
-     */
-    @JsonGetter("background_color")
-    public final String getBackgroundColor() {
-        return backgroundColor;
-    }
+	private IdentityProviderBranding(Builder builder) {
+		this.backgroundColor = builder.backgroundColor;
+		this.color = builder.color;
+		this.icons = builder.icons;
+	}
 
-    /**
-     * @return the color
-     */
-    @JsonGetter("color")
-    public final String getColor() {
-        return color;
-    }
+	@JsonGetter("background_color")
+	public String getBackgroundColor() {
+		return backgroundColor;
+	}
 
-    public static IBackgroundColorStage builder() {
-        return new Builder();
-    }
+	@JsonGetter("color")
+	public String getColor() {
+		return color;
+	}
 
-    public interface IBackgroundColorStage {
-        public IColorStage withBackgroundColor(String backgroundColor);
-    }
+	@JsonGetter("icons")
+	public List<IdentityProviderIcon> getIcons() {
+		return icons;
+	}
 
-    public interface IColorStage {
-        public IBuildStage withColor(String color);
-    }
+	public static IBuildStage builder() {
+		return new Builder();
+	}
 
-    public interface IBuildStage {
-        public IdentityProviderBranding build();
-    }
+	public interface IBuildStage {
+		public IBuildStage withBackgroundColor(String backgroundColor);
 
-    public static final class Builder implements IBackgroundColorStage, IColorStage, IBuildStage {
-        private String backgroundColor;
+		public IBuildStage withColor(String color);
 
-        private String color;
+		public IBuildStage withIcons(List<IdentityProviderIcon> icons);
 
-        private Builder() {
-        }
+		public IdentityProviderBranding build();
+	}
 
-        @Override
-        public IColorStage withBackgroundColor(final String backgroundColor) {
-            this.backgroundColor = backgroundColor;
-            return this;
-        }
+	public static final class Builder implements IBuildStage {
+		private String backgroundColor;
+		private String color;
+		private List<IdentityProviderIcon> icons = Collections.emptyList();
 
-        @Override
-        public IBuildStage withColor(final String color) {
-            this.color = color;
-            return this;
-        }
+		private Builder() {
+		}
 
-        @Override
-        public IdentityProviderBranding build() {
-            return new IdentityProviderBranding(this);
-        }
-    }
+		@Override
+		public IBuildStage withBackgroundColor(String backgroundColor) {
+			this.backgroundColor = backgroundColor;
+			return this;
+		}
 
-    // todo icons
+		@Override
+		public IBuildStage withColor(String color) {
+			this.color = color;
+			return this;
+		}
+
+		@Override
+		public IBuildStage withIcons(List<IdentityProviderIcon> icons) {
+			this.icons = icons;
+			return this;
+		}
+
+		@Override
+		public IdentityProviderBranding build() {
+			return new IdentityProviderBranding(this);
+		}
+	}
+
 }

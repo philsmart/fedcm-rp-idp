@@ -24,8 +24,9 @@ async function login() {
         }]
       }
     });
-
+	document.getElementById('token').innerHTML = idToken.token;
     console.log(`received token: ${idToken.token}`);
+    
   } catch (e) {
     console.log(`rejected with ${e}`);
   }
