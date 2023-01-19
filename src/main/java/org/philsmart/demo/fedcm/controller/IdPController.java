@@ -2,6 +2,7 @@
 package org.philsmart.demo.fedcm.controller;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.philsmart.demo.fedcm.model.IdentityProviderAPIConfig;
 import org.philsmart.demo.fedcm.model.IdentityProviderAccount;
@@ -13,6 +14,7 @@ import org.philsmart.demo.fedcm.model.IdentityProviderToken;
 import org.philsmart.demo.fedcm.model.IdentityProviderWellKnown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +23,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 /**
- * FedCM IdP endpoints
+ * Mock FedCM IdP endpoints
  */
 @Controller
 public class IdPController {
 
     /** Logger. */
     private static final Logger log = LoggerFactory.getLogger(IdPController.class);
+    
+    /** The hostname to use for certain response fields.*/
+    private final String hostname;
+    
+    /**
+     * Constructor.
+     * 
+     * @param host the hostname
+     */
+    public IdPController(@Value("${fedcm.idp.hostname}") String host){
+    	hostname = Objects.requireNonNull(host);
+    }
+    
+    @GetMapping("/idp")
+	public String getIdPIndex() {
+		return "idp";
+	}
 
     /**
      * Endpoint to fetch the manifest that holds the API config for this IdP.
@@ -41,7 +60,7 @@ public class IdPController {
                 .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
                 .withIdAssertionEndpoint("/fedcm/assertion")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
-                		.withIcons(List.of(IdentityProviderIcon.builder().withUrl("https://fedcm-demo.org/images/logo.ico")
+                		.withIcons(List.of(IdentityProviderIcon.builder().withUrl("https://"+hostname+"/images/logo.ico")
                 				.withSize(50).build())).build())
                 .build();
         log.info("Built IdentityProviderAPIConfig response: '{}'", config);
@@ -60,7 +79,7 @@ public class IdPController {
         final IdentityProviderAccount account =
                 IdentityProviderAccount.builder().withId("1234").withName("James Kirk").withEmail("james.kirk@idp.example")
                         .withGivenName("James").withApprovedClients(List.of("1234"))
-                        .withPicture("https://fedcm-demo.org/images/kirk.ico").build();
+                        .withPicture("https://"+hostname+"/images/kirk.ico").build();
 
         log.info("Built IdentityProviderAccount response: '{}'", account);
 
@@ -68,7 +87,7 @@ public class IdPController {
     }
 
     /**
-     * Endpoint for returning client metadata?
+     * Endpoint for returning client metadata.
      * 
      * @return the IdP's client metadata
      */
@@ -76,8 +95,8 @@ public class IdPController {
     public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata() {
         // Dummy response
         final IdentityProviderClientMetadata metadata = IdentityProviderClientMetadata.builder()
-                .withPrivacyPolicyUrl("https://fedcm-demo.org/privacy.html")
-                .withTermsOfServiceUrl("https://fedcm-demo.org/tos.html").build();
+                .withPrivacyPolicyUrl("https://"+hostname+"/privacy.html")
+                .withTermsOfServiceUrl("https://"+hostname+"/tos.html").build();
 
         log.info("Built IdentityProviderClientMetadata response: '{}'", metadata);
 
