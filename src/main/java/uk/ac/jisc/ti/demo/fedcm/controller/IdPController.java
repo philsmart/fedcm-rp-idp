@@ -1,17 +1,9 @@
 
-package org.philsmart.demo.fedcm.controller;
+package uk.ac.jisc.ti.demo.fedcm.controller;
 
 import java.util.List;
 import java.util.Objects;
 
-import org.philsmart.demo.fedcm.model.IdentityProviderAPIConfig;
-import org.philsmart.demo.fedcm.model.IdentityProviderAccount;
-import org.philsmart.demo.fedcm.model.IdentityProviderAccounts;
-import org.philsmart.demo.fedcm.model.IdentityProviderBranding;
-import org.philsmart.demo.fedcm.model.IdentityProviderClientMetadata;
-import org.philsmart.demo.fedcm.model.IdentityProviderIcon;
-import org.philsmart.demo.fedcm.model.IdentityProviderToken;
-import org.philsmart.demo.fedcm.model.IdentityProviderWellKnown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderBranding;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderClientMetadata;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderIcon;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
 
 /**
  * Mock FedCM IdP endpoints

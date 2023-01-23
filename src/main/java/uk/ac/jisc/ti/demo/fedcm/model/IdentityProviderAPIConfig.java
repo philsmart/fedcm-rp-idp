@@ -1,5 +1,5 @@
 
-package org.philsmart.demo.fedcm.model;
+package uk.ac.jisc.ti.demo.fedcm.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 

@@ -1,4 +1,4 @@
-package org.philsmart.demo.fedcm;
+package uk.ac.jisc.ti.demo.fedcm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

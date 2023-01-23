@@ -1,4 +1,4 @@
-package org.philsmart.demo.fedcm.controller;
+package uk.ac.jisc.ti.demo.fedcm.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
