@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Relying Party FedCM Demo</title>
-<script src="js/rp.js" async></script>
 <link rel="stylesheet" href="css/style.css">
+
+<script th:inline="javascript">
+
+function isFedCMEnabled() {
+	  return !!window.IdentityCredential;
+}
+	console.log(isFedCMEnabled() ? "Modern FedCM is available" : "Modern FedCM is not available");
+
+function isOldFedCMEnabled() {
+	  return !(!window.FederatedCredential || !FederatedCredential.prototype.login);
+}
+console.log(isOldFedCMEnabled() ? "Old FedCM is available" : "Old FedCM is not available");
+
+async function login() {
+  try {
+    if (!isOldFedCMEnabled() && !isFedCMEnabled()) {
+      return;
+    }
+
+    var configURL = "https://"+[[${hostname}]]+"/fedcm.json" ;
+    console.log("Config URL: "+configURL);
+    var clientId = [[${clientId}]];
+
+    // In this example, https://idp.example is the IdP's URL.
+    var idToken = await navigator.credentials.get({
+      identity: {
+        providers: [{
+          configURL: configURL, // IdP domain
+          clientId: clientId, // Client ID of the RP
+          nonce: "5678", // Nonce (random value)
+        }]
+      }
+    });
+	document.getElementById('token').innerHTML = idToken.token;
+    console.log(`received token: ${idToken.token}`);
+    
+  } catch (e) {
+    console.log(`rejected with ${e}`);
+  }
+};
+</script>
+<script type="text/javascript" th:inline="javascript"
+	th:src="@{js/rp.js}"></script>
+
+
 </head>
 <body style="margin: 10px">
 
@@ -33,8 +77,7 @@
 			<button onclick="login()">Login (FedCM)</button>
 		</div>
 
-		<div
-			id="token-inner">
+		<div id="token-inner">
 			<h4 style="text-align: center">Token Response</h4>
 
 			<textArea id="token"></textArea>
