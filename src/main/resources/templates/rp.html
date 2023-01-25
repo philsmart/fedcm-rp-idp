@@ -64,7 +64,7 @@ async function login() {
 			(navigator.credentials.get())</h4>
 		<ol>
 			<li>GET Request to the well-known web identity file:<a
-				href=".well-known/web-identity">.well-known/web-identity</a></li>
+				th:href="'https://'+${rootDomain}+'/.well-known/web-identity'">.well-known/web-identity</a></li>
 			<li>GET Request to the config endpoint: <a href="fedcm.json">fedcm.json</a></li>
 			<li>GET Request to the accounts endpoint: <a
 				href="fedcm/accounts">fedcm/accounts</a></li>

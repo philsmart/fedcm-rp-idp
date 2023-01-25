@@ -24,6 +24,9 @@ public class RPController {
 
     /** The hostname to use for certain response fields. */
     private final String hostname;
+    
+    /** The root domain, where the well-known file is served.*/
+    private final String rootDomain;
 
     /** The clientID. */
     private final String clientId;
@@ -34,14 +37,17 @@ public class RPController {
      * @param host the hostname
      */
     public RPController(@Value("${fedcm.idp.hostname}") final String host,
+    		@Value("${fedcm.idp.rootdomain}") final String root,
             @Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier) {
         hostname = Objects.requireNonNull(host);
         clientId = Objects.requireNonNull(clientIdentifier);
+        rootDomain = Objects.requireNonNull(root);
     }
 
     @GetMapping("/rp")
     public String getRPIndex(final Model model) {
         model.addAttribute("hostname", hostname);
+        model.addAttribute("rootDomain", rootDomain);
         model.addAttribute("clientId", clientId);
         return "rp";
     }
