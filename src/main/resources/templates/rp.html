@@ -23,20 +23,7 @@ async function login() {
       return;
     }
 
-    var configURL = "https://"+[[${hostname}]]+"/fedcm.json" ;
-    console.log("Config URL: "+configURL);
-    var clientId = [[${clientId}]];
-
-    // In this example, https://idp.example is the IdP's URL.
-    var idToken = await navigator.credentials.get({
-      identity: {
-        providers: [{
-          configURL: configURL, // IdP domain
-          clientId: clientId, // Client ID of the RP
-          nonce: "5678", // Nonce (random value)
-        }]
-      }
-    });
+    var idToken = await navigator.credentials.get([(${credentialRequestOptionsSingle})]);
 	document.getElementById('token').innerHTML = idToken.token;
     console.log(`received token: ${idToken.token}`);
     
@@ -44,6 +31,21 @@ async function login() {
     console.log(`rejected with ${e}`);
   }
 };
+
+async function loginMultiple() {
+	  try {
+	    if (!isOldFedCMEnabled() && !isFedCMEnabled()) {
+	      return;
+	    }
+
+	    var idToken = await navigator.credentials.get([(${credentialRequestOptionsMultiple})]);
+		document.getElementById('token').innerHTML = idToken.token;
+	    console.log(`received token: ${idToken.token}`);
+	    
+	  } catch (e) {
+	    console.log(`rejected with ${e}`);
+	  }
+	};
 </script>
 <script type="text/javascript" th:inline="javascript"
 	th:src="@{js/rp.js}"></script>
@@ -74,7 +76,10 @@ async function login() {
 		</ol>
 
 		<div style="text-align: center">
-			<button onclick="login()">Login (FedCM)</button>
+			<button onclick="login()">Login (FedCM)</button>			
+		</div>
+		<div style="text-align: center; margin-top:5px">
+			<button onclick="loginMultiple()">Login Multiple Providers (FedCM)</button>
 		</div>
 
 		<div id="token-inner">
