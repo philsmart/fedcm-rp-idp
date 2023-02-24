@@ -2,6 +2,7 @@
 package uk.ac.jisc.ti.demo.fedcm.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
@@ -31,23 +34,23 @@ public class IdPController {
 
     /** Logger. */
     private static final Logger log = LoggerFactory.getLogger(IdPController.class);
-    
-    /** The hostname to use for certain response fields.*/
+
+    /** The hostname to use for certain response fields. */
     private final String hostname;
-    
+
     /**
      * Constructor.
      * 
      * @param host the hostname
      */
-    public IdPController(@Value("${fedcm.idp.hostname}") String host){
-    	hostname = Objects.requireNonNull(host);
+    public IdPController(@Value("${fedcm.idp.hostname}") final String host) {
+        hostname = Objects.requireNonNull(host);
     }
-    
+
     @GetMapping("/idp")
-	public String getIdPIndex() {
-		return "idp";
-	}
+    public String getIdPIndex() {
+        return "idp";
+    }
 
     /**
      * Endpoint to fetch the manifest that holds the API config for this IdP.
@@ -61,8 +64,9 @@ public class IdPController {
                 .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
                 .withIdAssertionEndpoint("/fedcm/assertion")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
-                		.withIcons(List.of(IdentityProviderIcon.builder().withUrl("https://"+hostname+"/images/logo.ico")
-                				.withSize(50).build())).build())
+                        .withIcons(List.of(IdentityProviderIcon.builder()
+                                .withUrl("https://" + hostname + "/images/logo.ico").withSize(50).build()))
+                        .build())
                 .build();
         log.info("Built IdentityProviderAPIConfig response: '{}'", config);
 
@@ -75,12 +79,18 @@ public class IdPController {
      * @return the signed-in accounts for the identified sesssion
      */
     @GetMapping(path = "/fedcm/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderAccounts> getAccounts() {
+    public ResponseEntity<IdentityProviderAccounts> getAccounts(@RequestHeader final Map<String, String> headers,
+            @RequestParam final Map<String, String> allRequestParams) {
+
+        headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));
+
+        // There should not be any of these.
+        allRequestParams.entrySet().forEach(p -> log.info("FedCM Accounts Param: {}", p));
+
         // Dummy response
-        final IdentityProviderAccount account =
-                IdentityProviderAccount.builder().withId("1234").withName("James Kirk").withEmail("james.kirk@idp.example")
-                        .withGivenName("James").withApprovedClients(List.of("1234"))
-                        .withPicture("https://"+hostname+"/images/kirk.ico").build();
+        final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
+                .withEmail("james.kirk@idp.example").withGivenName("James").withApprovedClients(List.of("1234"))
+                .withPicture("https://" + hostname + "/images/kirk.ico").build();
 
         log.info("Built IdentityProviderAccount response: '{}'", account);
 
@@ -95,9 +105,9 @@ public class IdPController {
     @GetMapping(path = "/fedcm/client_metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata() {
         // Dummy response
-        final IdentityProviderClientMetadata metadata = IdentityProviderClientMetadata.builder()
-                .withPrivacyPolicyUrl("https://"+hostname+"/privacy.html")
-                .withTermsOfServiceUrl("https://"+hostname+"/tos.html").build();
+        final IdentityProviderClientMetadata metadata =
+                IdentityProviderClientMetadata.builder().withPrivacyPolicyUrl("https://" + hostname + "/privacy.html")
+                        .withTermsOfServiceUrl("https://" + hostname + "/tos.html").build();
 
         log.info("Built IdentityProviderClientMetadata response: '{}'", metadata);
 
@@ -110,29 +120,34 @@ public class IdPController {
      * @return a dummy assertion for now
      */
     @PostMapping(path = "/fedcm/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderToken> getAssertion() {
+    public ResponseEntity<IdentityProviderToken> getAssertion(@RequestHeader final Map<String, String> headers,
+            @RequestParam final Map<String, String> allRequestParams) {
+
+        headers.entrySet().forEach(h -> log.info("FedCM Assertion Header: {}", h));
+
+        allRequestParams.entrySet().forEach(p -> log.info("FedCM Assertion Param: {}", p));
+
         // Dummy response
         final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
                 + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         final IdentityProviderToken token = new IdentityProviderToken(dummyJWT);
-        
+
         log.info("Built IdentityProviderToken: '{}'", token);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
-    
+
     /**
-     * Get the well-known webidentity of this IdP. Which points to the server manifests. 
-     * See {@link #getManifest()}.
+     * Get the well-known webidentity of this IdP. Which points to the server manifests. See {@link #getManifest()}.
      * 
      * @return the IdentityProviderWellKnown JSON
      */
     @GetMapping(path = ".well-known/web-identity", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderWellKnown> getWebIdentity() {
         // Dummy response
-        IdentityProviderWellKnown wellKnown = new IdentityProviderWellKnown(List.of("/fedcm.json"));
+        final IdentityProviderWellKnown wellKnown = new IdentityProviderWellKnown(List.of("/fedcm.json"));
 
         return ResponseEntity.status(HttpStatus.OK).body(wellKnown);
-    } 
+    }
 
 }
