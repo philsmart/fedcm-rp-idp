@@ -1,6 +1,7 @@
 
 package uk.ac.jisc.ti.demo.fedcm.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
@@ -48,7 +51,9 @@ public class IdPController {
     }
 
     @GetMapping("/idp")
-    public String getIdPIndex() {
+    public String getIdPIndex(final HttpServletRequest req) {
+    	// Create a session cookie so you can see it being returned.
+    	req.getSession();
         return "idp";
     }
 
@@ -79,8 +84,13 @@ public class IdPController {
      * @return the signed-in accounts for the identified sesssion
      */
     @GetMapping(path = "/fedcm/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderAccounts> getAccounts(@RequestHeader final Map<String, String> headers,
+    public ResponseEntity<IdentityProviderAccounts> getAccounts(HttpServletRequest req, 
+    		@RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
+    	
+    	if (req.getCookies() != null) {
+    		Arrays.stream(req.getCookies()).forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
+    	}
 
         headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));
 
@@ -120,8 +130,13 @@ public class IdPController {
      * @return a dummy assertion for now
      */
     @PostMapping(path = "/fedcm/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderToken> getAssertion(@RequestHeader final Map<String, String> headers,
+    public ResponseEntity<IdentityProviderToken> getAssertion(HttpServletRequest req,
+    		@RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
+    	
+    	if (req.getCookies() != null) {
+    		Arrays.stream(req.getCookies()).forEach(c -> log.info("FedCM Assertion Cookie: {}:{}", c.getName(), c.getValue()));
+    	}
 
         headers.entrySet().forEach(h -> log.info("FedCM Assertion Header: {}", h));
 
@@ -148,6 +163,14 @@ public class IdPController {
         final IdentityProviderWellKnown wellKnown = new IdentityProviderWellKnown(List.of("/fedcm.json"));
 
         return ResponseEntity.status(HttpStatus.OK).body(wellKnown);
+    }
+    
+    private String getCookieValue(HttpServletRequest req, String cookieName) {
+        return Arrays.stream(req.getCookies())
+                .filter(c -> c.getName().equals(cookieName))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
 }
