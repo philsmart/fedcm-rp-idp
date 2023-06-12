@@ -30,7 +30,7 @@ import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
 
 /**
- * Mock FedCM IdP endpoints
+ * Mock FedCM IdP endpoints. 
  */
 @Controller
 public class IdPController {
