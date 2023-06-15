@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.jisc.ti.demo.fedcm.model.CredentialRequestOptions;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityCredentialRequestOptions;
+import uk.ac.jisc.ti.demo.fedcm.model.IdentityCredentialRequestOptionsContext;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderConfig;
 
 /**
@@ -106,7 +107,7 @@ public class RPController {
                         .withClientId(clientId).withNonce(UUID.randomUUID().toString()).build());
 
         return CredentialRequestOptions.builder()
-                .withIdentity(IdentityCredentialRequestOptions.builder().withProviders(configs).build()).build();
+                .withIdentity(IdentityCredentialRequestOptions.builder().withProviders(configs).withContext(IdentityCredentialRequestOptionsContext.SIGNIN).build()).build();
     }
 
     /** Build a credential request options for multiple providers. */

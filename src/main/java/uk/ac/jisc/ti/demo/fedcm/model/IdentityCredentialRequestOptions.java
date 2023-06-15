@@ -8,11 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IdentityCredentialRequestOptions {
 
-    private final List<IdentityProviderConfig> providers;
+	private final List<IdentityProviderConfig> providers;
 
-    private IdentityCredentialRequestOptions(final Builder builder) {
-        this.providers = builder.providers;
-    }
+	private final IdentityCredentialRequestOptionsContext context;
 
     /**
      * @return the providers
@@ -21,35 +19,58 @@ public class IdentityCredentialRequestOptions {
     public final List<IdentityProviderConfig> getProviders() {
         return providers;
     }
-
-    public static IProvidersStage builder() {
-        return new Builder();
+    
+    @JsonProperty("context")
+    public final String getContext() {
+    	return context.getName();
     }
 
-    public interface IProvidersStage {
-        public IBuildStage withProviders(List<IdentityProviderConfig> providers);
-    }
+	private IdentityCredentialRequestOptions(Builder builder) {
+		this.providers = builder.providers;
+		this.context = builder.context;
+	}
 
-    public interface IBuildStage {
-        public IdentityCredentialRequestOptions build();
-    }
 
-    public static final class Builder implements IProvidersStage, IBuildStage {
-        private List<IdentityProviderConfig> providers = Collections.emptyList();
+	public static IProvidersStage builder() {
+		return new Builder();
+	}
 
-        private Builder() {
-        }
 
-        @Override
-        public IBuildStage withProviders(final List<IdentityProviderConfig> providers) {
-            this.providers = providers;
-            return this;
-        }
+	public interface IProvidersStage {
+		public IBuildStage withProviders(List<IdentityProviderConfig> providers);
+	}
 
-        @Override
-        public IdentityCredentialRequestOptions build() {
-            return new IdentityCredentialRequestOptions(this);
-        }
-    }
+
+	public interface IBuildStage {
+		public IBuildStage withContext(IdentityCredentialRequestOptionsContext context);
+
+		public IdentityCredentialRequestOptions build();
+	}
+
+
+	public static final class Builder implements IProvidersStage, IBuildStage {
+		private List<IdentityProviderConfig> providers = Collections.emptyList();
+		private IdentityCredentialRequestOptionsContext context = IdentityCredentialRequestOptionsContext.SIGNIN;
+
+		private Builder() {
+		}
+
+		@Override
+		public IBuildStage withProviders(List<IdentityProviderConfig> providers) {
+			this.providers = providers;
+			return this;
+		}
+
+		@Override
+		public IBuildStage withContext(IdentityCredentialRequestOptionsContext context) {
+			this.context = context;
+			return this;
+		}
+
+		@Override
+		public IdentityCredentialRequestOptions build() {
+			return new IdentityCredentialRequestOptions(this);
+		}
+	}
 
 }
