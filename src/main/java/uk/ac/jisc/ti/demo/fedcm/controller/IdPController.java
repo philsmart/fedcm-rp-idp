@@ -30,7 +30,7 @@ import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
 
 /**
- * Mock FedCM IdP endpoints. 
+ * Mock FedCM IdP endpoints.
  */
 @Controller
 public class IdPController {
@@ -52,8 +52,8 @@ public class IdPController {
 
     @GetMapping("/idp")
     public String getIdPIndex(final HttpServletRequest req) {
-    	// Create a session cookie so you can see it being returned.
-    	req.getSession();
+        // Create a session cookie so you can see it being returned.
+        req.getSession();
         return "idp";
     }
 
@@ -84,13 +84,14 @@ public class IdPController {
      * @return the signed-in accounts for the identified sesssion
      */
     @GetMapping(path = "/fedcm/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderAccounts> getAccounts(HttpServletRequest req, 
-    		@RequestHeader final Map<String, String> headers,
+    public ResponseEntity<IdentityProviderAccounts> getAccounts(final HttpServletRequest req,
+            @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
-    	
-    	if (req.getCookies() != null) {
-    		Arrays.stream(req.getCookies()).forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
-    	}
+
+        if (req.getCookies() != null) {
+            Arrays.stream(req.getCookies())
+                    .forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
+        }
 
         headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));
 
@@ -130,13 +131,14 @@ public class IdPController {
      * @return a dummy assertion for now
      */
     @PostMapping(path = "/fedcm/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderToken> getAssertion(HttpServletRequest req,
-    		@RequestHeader final Map<String, String> headers,
+    public ResponseEntity<IdentityProviderToken> getAssertion(final HttpServletRequest req,
+            @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
-    	
-    	if (req.getCookies() != null) {
-    		Arrays.stream(req.getCookies()).forEach(c -> log.info("FedCM Assertion Cookie: {}:{}", c.getName(), c.getValue()));
-    	}
+
+        if (req.getCookies() != null) {
+            Arrays.stream(req.getCookies())
+                    .forEach(c -> log.info("FedCM Assertion Cookie: {}:{}", c.getName(), c.getValue()));
+        }
 
         headers.entrySet().forEach(h -> log.info("FedCM Assertion Header: {}", h));
 
@@ -146,7 +148,8 @@ public class IdPController {
         final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
                 + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        final IdentityProviderToken token = new IdentityProviderToken(dummyJWT);
+        final IdentityProviderToken token =
+                IdentityProviderToken.builder().withToken(dummyJWT).withContinueOn("https://somewhereelse").build();
 
         log.info("Built IdentityProviderToken: '{}'", token);
         return ResponseEntity.status(HttpStatus.OK).body(token);
@@ -164,13 +167,10 @@ public class IdPController {
 
         return ResponseEntity.status(HttpStatus.OK).body(wellKnown);
     }
-    
-    private String getCookieValue(HttpServletRequest req, String cookieName) {
-        return Arrays.stream(req.getCookies())
-                .filter(c -> c.getName().equals(cookieName))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElse(null);
+
+    private String getCookieValue(final HttpServletRequest req, final String cookieName) {
+        return Arrays.stream(req.getCookies()).filter(c -> c.getName().equals(cookieName)).findFirst()
+                .map(Cookie::getValue).orElse(null);
     }
 
 }

@@ -102,12 +102,12 @@ public class RPController {
 
     /** Build a credential request options. */
     private CredentialRequestOptions buildCredentialRequestOptions() {
-        final List<IdentityProviderConfig> configs =
-                List.of(IdentityProviderConfig.builder().withConfigURL("https://" + hostname + "/fedcm.json")
-                        .withClientId(clientId).withNonce(UUID.randomUUID().toString()).build());
+        final List<IdentityProviderConfig> configs = List.of(IdentityProviderConfig.builder()
+                .withConfigURL("https://" + hostname + "/fedcm.json").withClientId(clientId)
+                .withNonce(UUID.randomUUID().toString()).withScopes(List.of("profile", "scopes", "newscope")).build());
 
-        return CredentialRequestOptions.builder()
-                .withIdentity(IdentityCredentialRequestOptions.builder().withProviders(configs).withContext(IdentityCredentialRequestOptionsContext.SIGNIN).build()).build();
+        return CredentialRequestOptions.builder().withIdentity(IdentityCredentialRequestOptions.builder()
+                .withProviders(configs).withContext(IdentityCredentialRequestOptionsContext.CONTINUE).build()).build();
     }
 
     /** Build a credential request options for multiple providers. */
