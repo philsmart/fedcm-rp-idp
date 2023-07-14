@@ -1,0 +1,21 @@
+function isFedCMEnabled() {
+  return !!window.IdentityCredential;
+}
+
+async function logout() {
+	try {
+		if (!isFedCMEnabled()) {
+			return;
+		}
+
+		await IdentityCredential.logoutRPs([{
+			url: "https://fedcm-demo.org/rp/logout",
+			accountId: "1234",
+		}]);
+		console.log(`Logout out`);
+
+	} catch (e) {
+		console.log(`Logout failed ${e}`);
+	}
+};
+
