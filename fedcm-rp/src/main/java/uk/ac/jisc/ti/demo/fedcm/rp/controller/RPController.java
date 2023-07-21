@@ -57,6 +57,7 @@ public class RPController {
         rootDomain = Objects.requireNonNull(root);
 
         mapper = new ObjectMapper();
+        log.info("++Started FedCM Relying Party");
     }
 
     /**

@@ -47,6 +47,7 @@ public class IdPController {
      * @param host the hostname
      */
     public IdPController(@Value("${fedcm.idp.hostname}") final String host) {
+    	log.info("++Started FedCM Identity Provider");
         hostname = Objects.requireNonNull(host);
     }
 
