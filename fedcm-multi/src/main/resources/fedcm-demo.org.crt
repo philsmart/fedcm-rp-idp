@@ -1,0 +1,87 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            93:db:05:6c:9e:4b:3a:7c:27:de:ee:2b:b4:dd:df:a8
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=Easy-RSA CA
+        Validity
+            Not Before: Jan 14 11:16:42 2023 GMT
+            Not After : Apr 18 11:16:42 2025 GMT
+        Subject: CN=fedcm-demo.org
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:b8:5f:71:b6:e7:76:aa:39:17:58:61:ab:77:05:
+                    a6:41:b9:00:24:91:94:54:2b:23:ca:31:95:78:64:
+                    62:8e:a4:77:76:fd:f2:bc:da:35:36:2c:e6:3e:11:
+                    b7:7f:d0:e8:b6:f3:32:25:6f:57:ae:32:94:80:6f:
+                    5b:40:b6:ed:bb:3c:84:e7:d5:d4:c6:ad:cd:56:d5:
+                    2d:b7:9e:75:65:ee:b5:d2:e4:93:2b:7f:45:b8:87:
+                    18:1b:e9:b2:be:e9:ef:1d:49:93:fb:81:45:b5:a3:
+                    ee:de:b4:08:d5:be:65:1c:7c:5e:cc:ee:96:cf:bb:
+                    17:1e:f9:79:9c:85:2e:cd:e3:e6:ad:7e:5a:d4:ef:
+                    1d:39:31:7a:0a:8e:63:db:23:cb:a1:e9:26:17:16:
+                    87:7d:3c:c0:bd:7f:1b:81:9d:65:01:39:6d:e1:f5:
+                    39:b7:8c:07:7e:13:a9:b8:c1:0f:ac:46:6f:e2:81:
+                    4a:4e:11:19:a5:0a:e2:13:c3:1b:ba:e1:43:a5:c7:
+                    4d:ac:3e:44:ab:e8:b5:99:d6:ed:5b:26:67:13:0d:
+                    dc:a8:5f:3a:09:08:7d:9e:ef:75:73:7b:6e:11:6a:
+                    26:2e:cb:0c:32:bc:d0:19:11:b1:85:be:0f:9a:d7:
+                    34:38:c7:70:40:65:57:36:1f:7d:db:b2:a5:c2:b0:
+                    1d:a1
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                12:A5:B3:BF:5C:98:DF:DD:52:C1:E8:30:B8:89:89:A4:E7:AB:F4:2D
+            X509v3 Authority Key Identifier: 
+                keyid:CE:89:F4:06:61:5A:3A:AA:0A:A5:05:B8:2B:F1:9F:CB:0F:38:3D:35
+                DirName:/CN=Easy-RSA CA
+                serial:CD:EF:48:48:5F:2E:18:21
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:fedcm-demo.org
+    Signature Algorithm: sha256WithRSAEncryption
+         55:ff:02:df:11:72:9f:b9:0d:74:4f:e5:44:bf:7a:ab:12:92:
+         fd:1c:0c:ae:3e:f8:f8:00:f7:64:c7:6f:c2:38:c7:f5:7e:a3:
+         7c:fc:50:59:85:81:fc:e7:17:00:8a:96:59:7d:b1:0a:8e:45:
+         ac:57:7c:41:de:74:85:49:33:a5:ae:d7:1d:26:5b:08:64:63:
+         60:16:3d:3b:ad:3e:f6:6d:6c:8a:48:33:5b:8e:f3:c8:04:4c:
+         2f:4f:3e:ee:14:63:0c:4b:27:04:f9:21:06:6e:a1:9e:30:35:
+         e5:c8:3f:b8:78:a2:8d:e0:6c:59:86:ac:f5:5d:03:3f:0e:90:
+         45:a6:77:8e:e1:83:8e:64:91:59:d2:da:36:c4:2e:35:7d:57:
+         45:c0:9d:a7:7b:fb:88:33:60:b3:df:a7:41:de:b5:c7:f0:38:
+         a3:95:3f:ef:c6:50:de:c8:37:d3:96:c1:d1:83:2d:79:6d:04:
+         ea:d4:dc:09:b8:7c:17:ef:28:10:cc:0e:91:84:c3:f3:e1:c7:
+         d4:d0:6c:69:3f:93:2d:0e:50:31:0f:42:6c:0f:28:7e:6f:cc:
+         e9:ec:4e:39:e8:24:88:6b:25:dd:51:36:bc:82:ec:e0:cc:da:
+         90:1e:a9:ba:3f:4f:b5:0c:97:d1:de:3f:36:da:fe:8e:d3:15:
+         ec:4f:02:70
+-----BEGIN CERTIFICATE-----
+MIIDbTCCAlWgAwIBAgIRAJPbBWyeSzp8J97uK7Td36gwDQYJKoZIhvcNAQELBQAw
+FjEUMBIGA1UEAwwLRWFzeS1SU0EgQ0EwHhcNMjMwMTE0MTExNjQyWhcNMjUwNDE4
+MTExNjQyWjAZMRcwFQYDVQQDDA5mZWRjbS1kZW1vLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALhfcbbndqo5F1hhq3cFpkG5ACSRlFQrI8oxlXhk
+Yo6kd3b98rzaNTYs5j4Rt3/Q6LbzMiVvV64ylIBvW0C27bs8hOfV1MatzVbVLbee
+dWXutdLkkyt/RbiHGBvpsr7p7x1Jk/uBRbWj7t60CNW+ZRx8Xszuls+7Fx75eZyF
+Ls3j5q1+WtTvHTkxegqOY9sjy6HpJhcWh308wL1/G4GdZQE5beH1ObeMB34TqbjB
+D6xGb+KBSk4RGaUK4hPDG7rhQ6XHTaw+RKvotZnW7VsmZxMN3KhfOgkIfZ7vdXN7
+bhFqJi7LDDK80BkRsYW+D5rXNDjHcEBlVzYffduypcKwHaECAwEAAaOBsjCBrzAJ
+BgNVHRMEAjAAMB0GA1UdDgQWBBQSpbO/XJjf3VLB6DC4iYmk56v0LTBGBgNVHSME
+PzA9gBTOifQGYVo6qgqlBbgr8Z/LDzg9NaEapBgwFjEUMBIGA1UEAwwLRWFzeS1S
+U0EgQ0GCCQDN70hIXy4YITATBgNVHSUEDDAKBggrBgEFBQcDATALBgNVHQ8EBAMC
+BaAwGQYDVR0RBBIwEIIOZmVkY20tZGVtby5vcmcwDQYJKoZIhvcNAQELBQADggEB
+AFX/At8Rcp+5DXRP5US/eqsSkv0cDK4++PgA92THb8I4x/V+o3z8UFmFgfznFwCK
+lll9sQqORaxXfEHedIVJM6Wu1x0mWwhkY2AWPTutPvZtbIpIM1uO88gETC9PPu4U
+YwxLJwT5IQZuoZ4wNeXIP7h4oo3gbFmGrPVdAz8OkEWmd47hg45kkVnS2jbELjV9
+V0XAnad7+4gzYLPfp0HetcfwOKOVP+/GUN7IN9OWwdGDLXltBOrU3Am4fBfvKBDM
+DpGEw/Phx9TQbGk/ky0OUDEPQmwPKH5vzOnsTjnoJIhrJd1RNryC7ODM2pAeqbo/
+T7UMl9HePzba/o7TFexPAnA=
+-----END CERTIFICATE-----

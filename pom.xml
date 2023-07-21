@@ -44,5 +44,6 @@
 		<module>fedcm-idp</module>
 		<module>fedcm-rp</module>
 		<module>fedcm-model</module>
+		<module>fedcm-multi</module>
 	</modules>
 </project>
