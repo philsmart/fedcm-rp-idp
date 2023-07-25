@@ -1,18 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>Identity Provider FedCM Demo</title>
-<script src="js/idp.js" async></script>
+	<meta charset="UTF-8">
+	<title>Identity Provider FedCM Demo</title>
+	<link rel="stylesheet" href="css/style-idp.css">
+	<script src="js/idp.js" async></script>
 </head>
+
 <body style="margin: 10px">
 
 	<div style="text-align: center">
 		<h1>Identity Provider FedCM Demo</h1>
-		<h3>
-			See the FedCM <a href="https://fedidcg.github.io/FedCM/">Sepcification</a>
-		</h3>
-	</div>
 
+	</div>
+	<div id="steps-outer">
+		<div style="text-align: center">
+			<h2>
+				<p th:if="${signedin}">Welcome back</p>
+			</h2>
+			<h2>
+				<p th:if="${signedin} == false">Please sign in</p>
+			</h2>
+		</div>
+		<div class="centre">
+			<a class="button centre" href="/idp/login">Sign-in</a>
+			<a class="button" href="/idp/logout">Logout</a>
+		</div>
+	</div>
 </body>
+<footer>
+	See the FedCM <a href="https://fedidcg.github.io/FedCM/">Sepcification</a>
+</footer>
+
 </html>

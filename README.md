@@ -11,6 +11,7 @@ Basic spring boot projects to test the [FedCM](https://fedidcg.github.io/FedCM/)
 
 Both The RP and IdP can be run standalone in their own embedded Tomcat container on port 443. By default both use the same certificate for `fedcm-demo.org`, this can be changed using the options shown below.
 
+
 ## Building the projects
 
 To build the projects:
@@ -24,8 +25,8 @@ To build the projects:
     3. For both together, `java -jar fedcm-multi/target/fedcm-multi-0.0.1-SNAPSHOT.jar`
 5. All components start on the standard HTTPS port (443) using the same certificate (hence without adjustment you can not run the IdP and RP as standalone services on the same host, that is what the multi project is for). The CA certificate used to sign the certificate is located in the resources folder and should be imported (and trusted) into your local keyring. 
 	1. The default certificate is valid for `fedcm-demo.org` and so an entry for that must exist in your local DNS, or more easily as an addition to your hosts file e.g. `127.0.0.1       fedcm-demo.org`.
-	2. For the RP, navigate to `https://fedcm-demo.org/rp`
-	3. The IdP endpoints can be navigated to fom the information provided by RP homepage.
+	2. To sign in to the IdP, navigate to `https://fedcm-demo.org/idp` and click sign in. You do not need any credentials, it just creates a session for you on the IdP.
+	2. For the RP, navigate to `https://fedcm-demo.org/rp` and try out the FedCM features. 
 	
 ## Configuring the projects
 

@@ -107,6 +107,12 @@ public class RPController {
         return "rp";
     }
 
+    /**
+     * Logout endpoint of the RP.
+     * 
+     * @return Logout success or failure.
+     */
+    //TODO not implemented
     @GetMapping(path = "/rp/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> logout() {
         log.info("Logout request sent from the IdP");

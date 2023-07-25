@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Relying Party FedCM Demo</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style-rp.css">
 
 <script th:inline="javascript">
 
@@ -69,10 +69,10 @@ async function loginMultiple() {
 				th:href="'https://'+${rootDomain}+'/.well-known/web-identity'">.well-known/web-identity</a></li>
 			<li>GET Request to the config endpoint: <a href="fedcm.json">fedcm.json</a></li>
 			<li>GET Request to the accounts endpoint: <a
-				href="fedcm/accounts">fedcm/accounts</a></li>
+				href="idp/accounts">idp/accounts</a></li>
 			<li>GET Request to the metadata endpoint: <a
-				href="fedcm/client_metadata">fedcm/client_metadata</a></li>
-			<li>POST Request to the assertion endpoint: fedcm/assertion</li>
+				href="idp/client_metadata">idp/client_metadata</a></li>
+			<li>POST Request to the assertion endpoint: idp/assertion</li>
 		</ol>
 
 		<div style="text-align: center">

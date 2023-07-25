@@ -15,6 +15,7 @@
 package uk.ac.jisc.ti.demo.fedcm.idp.controller;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -66,11 +68,71 @@ public class IdPController {
         hostname = Objects.requireNonNull(host);
     }
 
+    /**
+     * Get a basic IdP Page for login and logout.
+     * 
+     * @param req the HTTP request
+     * 
+     * @return the idp view
+     */
     @GetMapping("/idp")
-    public String getIdPIndex(final HttpServletRequest req) {
+    public String getIdPIndex(final HttpServletRequest req, Model model) {
+    	if (hasSession(req)) {
+    		model.addAttribute("signedin", true);
+    	} else {
+    		model.addAttribute("signedin", false);
+    	}
+    	
+        return "idp";
+    }
+    
+    /**
+     * Check if the user has a valid HTTP session. Also check the header to see if an override
+     * has been supplied which allows the endpoint to operate if it has no session.
+     * 
+     * @param req the HTTP request
+     * 
+     * @return if a session exists for this request or not
+     */
+    private boolean hasSession(@Nonnull final HttpServletRequest req) {
+    	if (req.getHeader("X-FedCM-IdP-NoSession") != null) {
+    		return true;
+    	}
+    	if (req.getSession(false) != null) {
+    		log.trace("User has a session", req.getSession(false).getId());
+    		return true;
+    	} else {
+    		log.trace("User does not have a session");
+    		return false;
+    	}
+    }
+    
+    /**
+     * Login to the IdP. Simply create a HTTP Session and set the session cookie, no actual authentication is required. 
+     * 
+     * 
+     * @param req the http request
+     * @return the IdP homepage
+     */
+    @GetMapping("/idp/login")
+    public String getLogin(final HttpServletRequest req) {
         // Create a session cookie so you can see it being returned.
         req.getSession();
-        return "idp";
+        return "redirect:/idp";
+    }
+    
+    /**
+     * Logout of the IdP. Simply remove their session.
+     * 
+     * 
+     * @param req the http request
+     * @return the IdP homepage
+     */
+    @GetMapping("/idp/logout")
+    public String getLogout(final HttpServletRequest req) {
+        // Create a session cookie so you can see it being returned.
+        req.getSession().invalidate();
+        return "redirect:/idp";
     }
 
     /**
@@ -82,8 +144,8 @@ public class IdPController {
     public ResponseEntity<IdentityProviderAPIConfig> getManifest() {
         // Dummy response
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
-                .withAccountsEndpoint("/fedcm/accounts").withClientMetadataEndpoint("/fedcm/client_metadata")
-                .withIdAssertionEndpoint("/fedcm/assertion")
+                .withAccountsEndpoint("/idp/accounts").withClientMetadataEndpoint("/idp/client_metadata")
+                .withIdAssertionEndpoint("/idp/assertion")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
                                 .withUrl("https://" + hostname + "/images/logo.ico").withSize(50).build()))
@@ -99,22 +161,29 @@ public class IdPController {
      * 
      * @return the signed-in accounts for the identified sesssion
      */
-    @GetMapping(path = "/fedcm/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/idp/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderAccounts> getAccounts(final HttpServletRequest req,
             @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
         
         checkRequestValidity(req, headers);
         logCookiesAndHeaders(req, headers, allRequestParams);
-
-        // Dummy response
-        final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
-                .withEmail("james.kirk@idp.example").withGivenName("James").withApprovedClients(List.of("1234"))
-                .withPicture("https://" + hostname + "/images/kirk.ico").build();
-
-        log.info("Built IdentityProviderAccount response: '{}'", account);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(List.of(account)));
+        
+        if (!hasSession(req)) {
+        	// Dummy response with no values	
+	        log.info("No session and no accounts");      
+	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(Collections.emptyList()));
+        	
+        } else {
+	        // Dummy response
+	        final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
+	                .withEmail("james.kirk@idp.example").withGivenName("James").withApprovedClients(List.of("1234"))
+	                .withPicture("https://" + hostname + "/images/kirk.ico").build();
+	
+	        log.info("Built IdentityProviderAccount response: '{}'", account);        
+	
+	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(List.of(account)));
+        }
     }
     
     /**
@@ -141,7 +210,8 @@ public class IdPController {
     /**
      * Is the HTTP request complaint with the FedCM specification.
      * 
-     * @param req the http request
+     * @param req the HTTP request
+     * @param headers the HTTP headers
      */
     private void checkRequestValidity(@Nonnull final HttpServletRequest req,
     		@Nonnull final Map<String, String> headers) {
@@ -154,10 +224,16 @@ public class IdPController {
     /**
      * Endpoint for returning client metadata.
      * 
+     * @param req the HTTP request
+     * @param headers the HTTP headers
+     * 
      * @return the IdP's client metadata
      */
-    @GetMapping(path = "/fedcm/client_metadata", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata() {
+    @GetMapping(path = "/idp/client_metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata(final HttpServletRequest req,
+            @RequestHeader final Map<String, String> headers) {
+    	
+    	checkRequestValidity(req, headers);
         // Dummy response
         final IdentityProviderClientMetadata metadata =
                 IdentityProviderClientMetadata.builder().withPrivacyPolicyUrl("https://" + hostname + "/privacy.html")
@@ -170,34 +246,51 @@ public class IdPController {
 
     /**
      * Identity assertion/token endpoint.
+     *      
+     * @param req the HTTP request
+     * @param headers the HTTP headers 
+     * @param allRequestParams the request parameters
      * 
      * @return a dummy assertion for now
      */
-    @PostMapping(path = "/fedcm/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/idp/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IdentityProviderToken> getAssertion(final HttpServletRequest req,
             @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
     	
     	logCookiesAndHeaders(req, headers, allRequestParams);
     	
-        // Dummy response
-        final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-                + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        final IdentityProviderToken token =
-                IdentityProviderToken.builder().withToken(dummyJWT).withContinueOn("https://somewhereelse").build();
-
-        log.info("Built IdentityProviderToken: '{}'", token);
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+    	if (!hasSession(req)) {
+    		log.info("No session and not assertion");
+    		final IdentityProviderToken token =
+	                IdentityProviderToken.builder().withToken("").build();
+    		return ResponseEntity.status(HttpStatus.OK).body(token);
+    	} else {
+	        // Dummy response
+	        final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+	                + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+	                + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+	        final IdentityProviderToken token =
+	                IdentityProviderToken.builder().withToken(dummyJWT).build();
+	
+	        log.info("Built IdentityProviderToken: '{}'", token);
+	        return ResponseEntity.status(HttpStatus.OK).body(token);
+    	}
     }
 
     /**
      * Get the well-known webidentity of this IdP. Which points to the server manifests. See {@link #getManifest()}.
      * 
+     * @param req the HTTP request
+     * @param headers the HTTP headers
      * @return the IdentityProviderWellKnown JSON
      */
     @GetMapping(path = ".well-known/web-identity", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IdentityProviderWellKnown> getWebIdentity() {
+    public ResponseEntity<IdentityProviderWellKnown> getWebIdentity(final HttpServletRequest req,
+            @RequestHeader final Map<String, String> headers) {
+    	
+    	checkRequestValidity(req, headers);
+    	
         // Dummy response
         final IdentityProviderWellKnown wellKnown = new IdentityProviderWellKnown(List.of("/fedcm.json"));
 
