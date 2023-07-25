@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
@@ -47,7 +49,7 @@ public class IdPController {
      * @param host the hostname
      */
     public IdPController(@Value("${fedcm.idp.hostname}") final String host) {
-    	log.info("++Started FedCM Identity Provider");
+    	log.info("++Started FedCM Identity Provider for host '{}'", host);
         hostname = Objects.requireNonNull(host);
     }
 
@@ -88,16 +90,9 @@ public class IdPController {
     public ResponseEntity<IdentityProviderAccounts> getAccounts(final HttpServletRequest req,
             @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
-
-        if (req.getCookies() != null) {
-            Arrays.stream(req.getCookies())
-                    .forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
-        }
-
-        headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));
-
-        // There should not be any of these.
-        allRequestParams.entrySet().forEach(p -> log.info("FedCM Accounts Param: {}", p));
+        
+        checkRequestValidity(req, headers);
+        logCookiesAndHeaders(req, headers, allRequestParams);
 
         // Dummy response
         final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
@@ -107,6 +102,40 @@ public class IdPController {
         log.info("Built IdentityProviderAccount response: '{}'", account);
 
         return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(List.of(account)));
+    }
+    
+    /**
+     * Log the cookies, headers, and any params in the request.
+     * 
+     * @param req the http request
+     * @param headers the http headers
+     * @param allRequestParams the http params
+     */
+    private void logCookiesAndHeaders(@Nonnull final HttpServletRequest req, 
+    		@Nonnull final Map<String, String> headers,
+    		@Nonnull final Map<String, String> allRequestParams) {
+    	
+        if (req.getCookies() != null) {
+            Arrays.stream(req.getCookies())
+                    .forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
+        }
+
+        headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));        
+
+        allRequestParams.entrySet().forEach(p -> log.info("FedCM Accounts Param: {}", p));
+    }
+    
+    /**
+     * Is the HTTP request complaint with the FedCM specification.
+     * 
+     * @param req the http request
+     */
+    private void checkRequestValidity(@Nonnull final HttpServletRequest req,
+    		@Nonnull final Map<String, String> headers) {
+    	
+    	if (!"webidentity".equals(headers.get("sec-fetch-dest"))) {
+    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sec-Fetch-Dest header is not webidentity");
+    	}
     }
 
     /**
@@ -135,16 +164,9 @@ public class IdPController {
     public ResponseEntity<IdentityProviderToken> getAssertion(final HttpServletRequest req,
             @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
-
-        if (req.getCookies() != null) {
-            Arrays.stream(req.getCookies())
-                    .forEach(c -> log.info("FedCM Assertion Cookie: {}:{}", c.getName(), c.getValue()));
-        }
-
-        headers.entrySet().forEach(h -> log.info("FedCM Assertion Header: {}", h));
-
-        allRequestParams.entrySet().forEach(p -> log.info("FedCM Assertion Param: {}", p));
-
+    	
+    	logCookiesAndHeaders(req, headers, allRequestParams);
+    	
         // Dummy response
         final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                 + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
@@ -169,7 +191,14 @@ public class IdPController {
         return ResponseEntity.status(HttpStatus.OK).body(wellKnown);
     }
 
-    private String getCookieValue(final HttpServletRequest req, final String cookieName) {
+    /**
+     * Get the value of a cookie.
+     * 
+     * @param req the http request
+     * @param cookieName the cookie name
+     * @return the cookie value
+     */
+    private String getCookieValue(@Nonnull final HttpServletRequest req, @Nonnull final String cookieName) {
         return Arrays.stream(req.getCookies()).filter(c -> c.getName().equals(cookieName)).findFirst()
                 .map(Cookie::getValue).orElse(null);
     }
