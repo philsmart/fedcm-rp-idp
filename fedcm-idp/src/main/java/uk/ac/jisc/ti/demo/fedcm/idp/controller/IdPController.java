@@ -124,7 +124,7 @@ public class IdPController {
     }
     
     /**
-     * Logout of the IdP. Simply remove their session.
+     * Logout of the IdP. Simply remove their session and send browser IdP-SignIn-Status action=signout-all.
      * 
      * 
      * @param req the http request
@@ -135,6 +135,20 @@ public class IdPController {
         // Create a session cookie so you can see it being returned.
         req.getSession().invalidate();
         resp.setHeader("IdP-SignIn-Status", "action=signout-all");
+        return "redirect:/idp";
+    }
+    
+    /**
+     * Logout of the IdP but do not send IdP-SignIn-Status back to the browser. 
+     * 
+     * 
+     * @param req the http request
+     * @return the IdP homepage
+     */
+    @GetMapping("/idp/logoutIdPOnly")
+    public String getLogoutIdPOnly(final HttpServletRequest req, final HttpServletResponse resp) {
+        // Create a session cookie so you can see it being returned.
+        req.getSession().invalidate();
         return "redirect:/idp";
     }
 
@@ -149,6 +163,7 @@ public class IdPController {
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
                 .withAccountsEndpoint("/idp/accounts").withClientMetadataEndpoint("/idp/client_metadata")
                 .withIdAssertionEndpoint("/idp/assertion")
+                .withSigninUrl("/idp")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
                                 .withUrl("https://" + hostname + "/images/logo.ico").withSize(50).build()))

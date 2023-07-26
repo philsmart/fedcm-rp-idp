@@ -6,6 +6,11 @@
 	<title>Identity Provider FedCM Demo</title>
 	<link rel="stylesheet" href="css/style-idp.css">
 	<script src="js/idp.js" async></script>
+
+	<script th:if="${signedin}">
+		<!-- Will even be called if not inside the login window, but no harm -->
+		IdentityProvider.close();
+	</script>
 </head>
 
 <body style="margin: 10px">
@@ -27,8 +32,11 @@
 			</h2>
 		</div>
 		<div class="centre">
-			<a class="button centre" href="/idp/login">Sign-in</a>
+			<a class="button centre" href="/idp/login">Sign-in</a>			
 			<a class="button" href="/idp/logout">Logout</a>
+		</div>
+		<div class="centre" style="margin-top:20px">
+			<a class="button centre" href="/idp/logoutIdPOnly">Invalidate IdP Session</a>			
 		</div>
 	</div>
 </body>

@@ -22,29 +22,26 @@ import com.fasterxml.jackson.annotation.JsonGetter;
  */
 public class IdentityProviderAPIConfig {
 
-    private final String accountsEndpoint;
+	private final String accountsEndpoint;
 
-    private final String clientMetadataEndpoint;
+	private final String clientMetadataEndpoint;
 
-    private final String idAssertionEndpoint;
+	private final String idAssertionEndpoint;
 
-    private final IdentityProviderBranding branding;
+	private final String signinUrl;
 
-    private IdentityProviderAPIConfig(final Builder builder) {
-        this.accountsEndpoint = builder.accountsEndpoint;
-        this.clientMetadataEndpoint = builder.clientMetadataEndpoint;
-        this.idAssertionEndpoint = builder.idAssertionEndpoint;
-        this.branding = builder.branding;
-    }
+	private final IdentityProviderBranding branding;
 
-    @Override
-    public String toString() {
-        return "IdentityProviderAPIConfig [accountsEndpoint=" + accountsEndpoint + ", clientMetadataEndpoint="
-                + clientMetadataEndpoint + ", idAssertionEndpoint=" + idAssertionEndpoint + ", branding=" + branding
-                + "]";
-    }
-
-    /**
+	
+	private IdentityProviderAPIConfig(Builder builder) {
+		this.accountsEndpoint = builder.accountsEndpoint;
+		this.clientMetadataEndpoint = builder.clientMetadataEndpoint;
+		this.idAssertionEndpoint = builder.idAssertionEndpoint;
+		this.signinUrl = builder.signinUrl;
+		this.branding = builder.branding;
+	}
+	
+	 /**
      * @return the accountsEndpoint
      */
     @JsonGetter("accounts_endpoint")
@@ -67,6 +64,14 @@ public class IdentityProviderAPIConfig {
     public final String getIdAssertionEndpoint() {
         return idAssertionEndpoint;
     }
+    
+    /**
+     * @return the idAssertionEndpoint
+     */
+    @JsonGetter("signin_url")
+    public final String getSigninUrl() {
+        return signinUrl;
+    }
 
     /**
      * @return the branding
@@ -76,71 +81,81 @@ public class IdentityProviderAPIConfig {
         return branding;
     }
 
-    public static IAccountsEndpointStage builder() {
-        return new Builder();
-    }
+	
+	public static IAccountsEndpointStage builder() {
+		return new Builder();
+	}
 
-    public interface IAccountsEndpointStage {
-        public IClientMetadataEndpointStage withAccountsEndpoint(String accountsEndpoint);
-    }
+	
+	public interface IAccountsEndpointStage {
+		public IClientMetadataEndpointStage withAccountsEndpoint(String accountsEndpoint);
+	}
 
-    public interface IClientMetadataEndpointStage {
-        public IIdAssertionEndpointStage withClientMetadataEndpoint(String clientMetadataEndpoint);
-    }
+	
+	public interface IClientMetadataEndpointStage {
+		public IIdAssertionEndpointStage withClientMetadataEndpoint(String clientMetadataEndpoint);
+	}
 
-    public interface IIdAssertionEndpointStage {
-        public IBrandingStage withIdAssertionEndpoint(String idAssertionEndpoint);
-    }
+	
+	public interface IIdAssertionEndpointStage {
+		public IBuildStage withIdAssertionEndpoint(String idAssertionEndpoint);
+	}
 
-    public interface IBrandingStage {
-        public IBuildStage withBranding(IdentityProviderBranding branding);
-    }
+	
+	public interface IBuildStage {
+		public IBuildStage withSigninUrl(String signinUrl);
 
-    public interface IBuildStage {
-        public IdentityProviderAPIConfig build();
-    }
+		public IBuildStage withBranding(IdentityProviderBranding branding);
 
-    public static final class Builder implements IAccountsEndpointStage, IClientMetadataEndpointStage,
-            IIdAssertionEndpointStage, IBrandingStage, IBuildStage {
-        private String accountsEndpoint;
+		public IdentityProviderAPIConfig build();
+	}
 
-        private String clientMetadataEndpoint;
+	
+	public static final class Builder
+			implements IAccountsEndpointStage, IClientMetadataEndpointStage, IIdAssertionEndpointStage, IBuildStage {
+		private String accountsEndpoint;
+		private String clientMetadataEndpoint;
+		private String idAssertionEndpoint;
+		private String signinUrl;
+		private IdentityProviderBranding branding;
 
-        private String idAssertionEndpoint;
+		private Builder() {
+		}
 
-        private IdentityProviderBranding branding;
+		@Override
+		public IClientMetadataEndpointStage withAccountsEndpoint(String accountsEndpoint) {
+			this.accountsEndpoint = accountsEndpoint;
+			return this;
+		}
 
-        private Builder() {
-        }
+		@Override
+		public IIdAssertionEndpointStage withClientMetadataEndpoint(String clientMetadataEndpoint) {
+			this.clientMetadataEndpoint = clientMetadataEndpoint;
+			return this;
+		}
 
-        @Override
-        public IClientMetadataEndpointStage withAccountsEndpoint(final String accountsEndpoint) {
-            this.accountsEndpoint = accountsEndpoint;
-            return this;
-        }
+		@Override
+		public IBuildStage withIdAssertionEndpoint(String idAssertionEndpoint) {
+			this.idAssertionEndpoint = idAssertionEndpoint;
+			return this;
+		}
 
-        @Override
-        public IIdAssertionEndpointStage withClientMetadataEndpoint(final String clientMetadataEndpoint) {
-            this.clientMetadataEndpoint = clientMetadataEndpoint;
-            return this;
-        }
+		@Override
+		public IBuildStage withSigninUrl(String signinUrl) {
+			this.signinUrl = signinUrl;
+			return this;
+		}
 
-        @Override
-        public IBrandingStage withIdAssertionEndpoint(final String idAssertionEndpoint) {
-            this.idAssertionEndpoint = idAssertionEndpoint;
-            return this;
-        }
+		@Override
+		public IBuildStage withBranding(IdentityProviderBranding branding) {
+			this.branding = branding;
+			return this;
+		}
 
-        @Override
-        public IBuildStage withBranding(final IdentityProviderBranding branding) {
-            this.branding = branding;
-            return this;
-        }
-
-        @Override
-        public IdentityProviderAPIConfig build() {
-            return new IdentityProviderAPIConfig(this);
-        }
-    }
+		@Override
+		public IdentityProviderAPIConfig build() {
+			return new IdentityProviderAPIConfig(this);
+		}
+	}
 
 }
