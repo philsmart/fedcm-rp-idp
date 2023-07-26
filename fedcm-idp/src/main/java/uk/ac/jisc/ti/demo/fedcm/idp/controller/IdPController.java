@@ -37,6 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
@@ -115,9 +116,10 @@ public class IdPController {
      * @return the IdP homepage
      */
     @GetMapping("/idp/login")
-    public String getLogin(final HttpServletRequest req) {
+    public String getLogin(final HttpServletRequest req, final HttpServletResponse resp) {
         // Create a session cookie so you can see it being returned.
         req.getSession();
+        resp.setHeader("IdP-SignIn-Status", "action=signin");
         return "redirect:/idp";
     }
     
@@ -129,9 +131,10 @@ public class IdPController {
      * @return the IdP homepage
      */
     @GetMapping("/idp/logout")
-    public String getLogout(final HttpServletRequest req) {
+    public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         // Create a session cookie so you can see it being returned.
         req.getSession().invalidate();
+        resp.setHeader("IdP-SignIn-Status", "action=signout-all");
         return "redirect:/idp";
     }
 
