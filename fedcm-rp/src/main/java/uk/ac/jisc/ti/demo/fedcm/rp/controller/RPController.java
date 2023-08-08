@@ -45,7 +45,7 @@ public class RPController {
     /** Logger. */
     private static final Logger log = LoggerFactory.getLogger(RPController.class);
 
-    /** The hostname to use for certain response fields. */
+    /** The hostname of the IdP to use for certain response fields. */
     private final String hostname;
 
     /** The root domain, where the well-known file is served. */
@@ -70,7 +70,7 @@ public class RPController {
         rootDomain = Objects.requireNonNull(root);
 
         mapper = new ObjectMapper();
-        log.info("++Started FedCM Relying Party for host '{}'", host);
+        log.info("++Started FedCM Relying Party using IdP host '{}'", host);
     }
 
     /**
