@@ -56,6 +56,9 @@ public class RPController {
 
     /** JSON Object Mapper. */
     private final ObjectMapper mapper;
+    
+    /** The url scheme. */
+    private final String scheme;
 
     /**
      * Constructor.
@@ -64,10 +67,12 @@ public class RPController {
      */
     public RPController(@Value("${fedcm.idp.hostname}") final String host,
             @Value("${fedcm.idp.rootdomain}") final String root,
-            @Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier) {
+            @Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier,
+            @Value("${fedcm.url.scheme:https://}") final String schemeIn) {
         hostname = Objects.requireNonNull(host);
         clientId = Objects.requireNonNull(clientIdentifier);
         rootDomain = Objects.requireNonNull(root);
+        scheme = Objects.requireNonNull(schemeIn);
 
         mapper = new ObjectMapper();
         log.info("++Started FedCM Relying Party using IdP host '{}'", host);
@@ -123,7 +128,7 @@ public class RPController {
     /** Build a credential request options. */
     private CredentialRequestOptions buildCredentialRequestOptions() {
         final List<IdentityProviderConfig> configs = List.of(IdentityProviderConfig.builder()
-                .withConfigURL("https://" + hostname + "/fedcm.json").withClientId(clientId)
+                .withConfigURL(scheme + hostname + "/fedcm.json").withClientId(clientId)
                 .withNonce(UUID.randomUUID().toString()).withScopes(List.of("profile", "scopes", "newscope")).build());
 
         return CredentialRequestOptions.builder().withIdentity(IdentityCredentialRequestOptions.builder()
@@ -133,10 +138,10 @@ public class RPController {
     /** Build a credential request options for multiple providers. */
     private CredentialRequestOptions buildCredentialRequestOptionsMultipleProviders() {
         final List<IdentityProviderConfig> configs = List.of(
-                IdentityProviderConfig.builder().withConfigURL("https://" + hostname + "/fedcm.json")
+                IdentityProviderConfig.builder().withConfigURL(scheme + hostname + "/fedcm.json")
                         .withClientId(clientId).withNonce(UUID.randomUUID().toString()).build(),
-                IdentityProviderConfig.builder().withConfigURL("https://fedcm-idp-demo.glitch.me/fedcm.json")
-                        .withClientId("'https://fedcm-rp-demo.glitch.me").withNonce(UUID.randomUUID().toString())
+                IdentityProviderConfig.builder().withConfigURL(scheme+"fedcm-idp-demo.glitch.me/fedcm.json")
+                        .withClientId(scheme+"fedcm-rp-demo.glitch.me").withNonce(UUID.randomUUID().toString())
                         .build());
 
         return CredentialRequestOptions.builder()

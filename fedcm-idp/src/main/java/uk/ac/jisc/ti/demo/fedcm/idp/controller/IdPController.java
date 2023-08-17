@@ -58,15 +58,20 @@ public class IdPController {
 
     /** The hostname to use for certain response fields. */
     private final String hostname;
+    
+    /** The url scheme. */
+    private final String scheme;
 
     /**
      * Constructor.
      * 
      * @param host the hostname
      */
-    public IdPController(@Value("${fedcm.idp.hostname}") final String host) {
+    public IdPController(@Value("${fedcm.idp.hostname}") final String host, 
+    		@Value("${fedcm.url.scheme:https://}") final String schemeIn) {
     	log.info("++Started FedCM Identity Provider for host '{}'", host);
         hostname = Objects.requireNonNull(host);
+        scheme = Objects.requireNonNull(schemeIn);
     }
 
     /**
@@ -132,7 +137,6 @@ public class IdPController {
      */
     @GetMapping("/idp/logout")
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
-        // Create a session cookie so you can see it being returned.
         req.getSession().invalidate();
         resp.setHeader("IdP-SignIn-Status", "action=signout-all");
         return "redirect:/idp";
@@ -147,7 +151,6 @@ public class IdPController {
      */
     @GetMapping("/idp/logoutIdPOnly")
     public String getLogoutIdPOnly(final HttpServletRequest req, final HttpServletResponse resp) {
-        // Create a session cookie so you can see it being returned.
         req.getSession().invalidate();
         return "redirect:/idp";
     }
@@ -166,7 +169,7 @@ public class IdPController {
                 .withSigninUrl("/idp")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
-                                .withUrl("https://" + hostname + "/images/logo.ico").withSize(50).build()))
+                                .withUrl(scheme + hostname + "/images/logo.ico").withSize(50).build()))
                         .build())
                 .build();
         log.info("Built IdentityProviderAPIConfig response: '{}'", config);
@@ -196,7 +199,7 @@ public class IdPController {
 	        // Dummy response
 	        final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
 	                .withEmail("james.kirk@idp.example").withGivenName("James").withApprovedClients(List.of("1234"))
-	                .withPicture("https://" + hostname + "/images/kirk.ico").build();
+	                .withPicture(scheme + hostname + "/images/kirk.ico").build();
 	
 	        log.info("Built IdentityProviderAccount response: '{}'", account);        
 	
@@ -255,7 +258,7 @@ public class IdPController {
         // Dummy response
         final IdentityProviderClientMetadata metadata =
                 IdentityProviderClientMetadata.builder().withPrivacyPolicyUrl("https://" + hostname + "/privacy.html")
-                        .withTermsOfServiceUrl("https://" + hostname + "/tos.html").build();
+                        .withTermsOfServiceUrl(scheme + hostname + "/tos.html").build();
 
         log.info("Built IdentityProviderClientMetadata response: '{}'", metadata);
 
