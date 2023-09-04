@@ -6,8 +6,8 @@ Basic spring boot projects to test the [FedCM](https://fedidcg.github.io/FedCM/)
 |---------|-------------|----------|
 | fedcm-model | The API model interfaces and implementation | no |
 | fedcm-idp | A mocked Identity Provider that provides the endpoints require for FedCM testing | yes |
-| fedcm-rp | A mocked Relying Party for initiating the FedCM API to authentication with the fedcm-idp IdP | yes |
-| fedcm-multi | A project that runs both fedcm-rp and fedcm-idp inside the same Tomcat container for test both components on the same host | yes |
+| fedcm-rp | A mocked Relying Party for initiating the FedCM API to authentication with the fedcm-idp | yes |
+| fedcm-multi | A project that runs both fedcm-rp and fedcm-idp inside the same Tomcat container for testing both components on the same host | yes |
 
 Both The RP and IdP can be run standalone in their own embedded Tomcat container on port 443. By default both use the same certificate for `fedcm-demo.org`, this can be changed using the options shown below.
 
