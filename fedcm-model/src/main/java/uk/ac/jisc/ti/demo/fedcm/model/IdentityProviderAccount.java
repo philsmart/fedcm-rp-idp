@@ -18,7 +18,14 @@ import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+@JsonDeserialize(builder = IdentityProviderAccount.Builder.class)
+@JsonInclude(Include.NON_NULL)
 public class IdentityProviderAccount {
 
 	private final String id;
@@ -33,6 +40,8 @@ public class IdentityProviderAccount {
 	private final List<String> approvedClients;
 
 	private final String picture;
+	
+	private final List<String> loginHints;
 
 	private IdentityProviderAccount(Builder builder) {
 		this.id = builder.id;
@@ -41,6 +50,7 @@ public class IdentityProviderAccount {
 		this.givenName = builder.givenName;
 		this.approvedClients = builder.approvedClients;
 		this.picture = builder.picture;
+		this.loginHints = builder.loginHints;
 	}
 
 	@Override
@@ -80,6 +90,14 @@ public class IdentityProviderAccount {
 	public final String getGivenName() {
 		return givenName;
 	}
+	
+	/**
+	 * @return the givenName
+	 */
+	@JsonGetter("login_hints")
+	public final List<String> getLoginHints() {
+		return loginHints;
+	}
 
 	/**
 	 * @return the approvedClients
@@ -116,10 +134,13 @@ public class IdentityProviderAccount {
 		public IBuildStage withApprovedClients(List<String> approvedClients);
 
 		public IBuildStage withPicture(String picture);
+		
+		public IBuildStage withLoginHints(List<String> loginHints);
 
 		public IdentityProviderAccount build();
 	}
-
+	
+	@JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
 	public static final class Builder implements IIdStage, INameStage, IEmailStage, IBuildStage {
 		private String id;
 		private String name;
@@ -127,6 +148,7 @@ public class IdentityProviderAccount {
 		private String givenName;
 		private List<String> approvedClients = Collections.emptyList();
 		private String picture;
+		private List<String> loginHints;
 
 		private Builder() {
 		}
@@ -150,14 +172,23 @@ public class IdentityProviderAccount {
 		}
 
 		@Override
+		@JsonProperty("given_name")
 		public IBuildStage withGivenName(String givenName) {
 			this.givenName = givenName;
 			return this;
 		}
 
 		@Override
+		@JsonProperty("approved_clients")
 		public IBuildStage withApprovedClients(List<String> approvedClients) {
 			this.approvedClients = approvedClients;
+			return this;
+		}
+		
+		@Override
+		@JsonProperty("login_hints")
+		public IBuildStage withLoginHints(List<String> loginHints) {
+			this.loginHints = loginHints;
 			return this;
 		}
 

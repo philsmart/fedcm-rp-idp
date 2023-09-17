@@ -15,7 +15,10 @@
 package uk.ac.jisc.ti.demo.fedcm.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+@JsonDeserialize(builder = CredentialRequestOptions.Builder.class)
 public class CredentialRequestOptions {
 
     private final IdentityCredentialRequestOptions identity;
@@ -44,6 +47,7 @@ public class CredentialRequestOptions {
         public CredentialRequestOptions build();
     }
 
+    @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
     public static final class Builder implements IIdentityStage, IBuildStage {
         private IdentityCredentialRequestOptions identity;
 
@@ -61,5 +65,10 @@ public class CredentialRequestOptions {
             return new CredentialRequestOptions(this);
         }
     }
+
+	@Override
+	public String toString() {
+		return "CredentialRequestOptions [identity=" + identity + "]";
+	}
 
 }

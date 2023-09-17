@@ -1,0 +1,17 @@
+{"identity":{
+	"providers": [
+		{
+			"configURL": "http://idp.localhost:8080/fedcm.json",
+			"clientId": "https://test.rp.org/",
+			"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025",
+			"scope": [
+				"profile",
+				"scopes",
+				"newscope"
+			]
+		}
+	],
+	"context": "continue"
+}}
+  
+  

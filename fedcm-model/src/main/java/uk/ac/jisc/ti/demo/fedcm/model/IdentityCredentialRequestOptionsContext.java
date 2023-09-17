@@ -13,12 +13,14 @@
  */
 package uk.ac.jisc.ti.demo.fedcm.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum IdentityCredentialRequestOptionsContext {
 	
-	SIGNIN("signin"),
-	SIGNUP("signup"),
-	USE("use"),
-	CONTINUE("continue");
+	@JsonProperty("signin") SIGNIN("signin"),
+	@JsonProperty("signup") SIGNUP("signup"),
+	@JsonProperty("use") USE("use"),
+	@JsonProperty("continue") CONTINUE("continue");
 
 	private final String name;
 	

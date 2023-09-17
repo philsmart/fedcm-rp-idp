@@ -9,7 +9,7 @@ Basic spring boot projects to test the [FedCM](https://fedidcg.github.io/FedCM/)
 | fedcm-rp | A mocked Relying Party for initiating the FedCM API to authentication with the fedcm-idp | yes |
 | fedcm-multi | A project that runs both fedcm-rp and fedcm-idp inside the same Tomcat container for testing both components on the same host | yes |
 
-Both The RP and IdP can be run standalone in their own embedded Tomcat container on port 443. By default both use the same certificate for `fedcm-demo.org`, this can be changed using the options shown below.
+Both The RP and IdP can be run standalone in their own embedded Tomcat container on port 8080. 
 
 
 ## Building the projects
@@ -23,10 +23,9 @@ To build the projects:
     1. For the IdP, `java -jar fedcm-idp/target/fedcm-idp-0.0.1-SNAPSHOT.jar`
     2. For the RP, `java -jar fedcm-rp/target/fedcm-rp-0.0.1-SNAPSHOT.jar`
     3. For both together, `java -jar fedcm-multi/target/fedcm-multi-0.0.1-SNAPSHOT.jar`
-5. All components start on the standard HTTPS port (443) using the same certificate (hence without adjustment you can not run the IdP and RP as standalone services on the same host, that is what the multi project is for). The CA certificate used to sign the certificate is located in the resources folder and should be imported (and trusted) into your local keyring. 
-	1. The default certificate is valid for `fedcm-demo.org` and so an entry for that must exist in your local DNS, or more easily as an addition to your hosts file e.g. `127.0.0.1       fedcm-demo.org`.
-	2. To sign in to the IdP, navigate to `https://fedcm-demo.org/idp` and click sign in. You do not need any credentials, it just creates a session for you on the IdP.
-	2. For the RP, navigate to `https://fedcm-demo.org/rp` and try out the FedCM features. 
+5. All components start on the standard HTTP port (8080), hence without adjustment you can not run the IdP and RP as standalone services on the same host — that is what the multi project is for. 
+	1. To sign in to the IdP, navigate to `http://idp.localhost:8080/idp` and click sign in. You do not need any credentials, it just creates a session for you on the IdP.
+	2. For the RP, navigate to `https://rp.localhost:8080/rp` and try out the FedCM features. 
 	
 ## Configuring the projects
 
@@ -34,16 +33,14 @@ If you want to override any of the default properties, you can supply appropriat
 
 | Option | Default | Description |
 |---------|--------|-------------|
-|fedcm.idp.rootdomain|fedcm-demo.org | the name of the root domain used when building responses |
-|server.port|443 | the server port | 
-|fedcm.idp.hostname|fedcm-demo.org | the hostname used when building responses |
-|server.ssl.key-store|<something.p12> | the key store to use that contains the certificate presented by Tomcat |
-|server.ssl.key-store-password|<password-for-key-store>|  the password for the key store |
+|server.port|8080 | the server port | 
+|fedcm.rp.idpConfig| Internal config for `http://idp.localhost:8080/fedcm.json` | location of the CredentialRequestOptions the RP uses to configure IdPs | 
+| fedcm.idp.idpAccounts| Internal accounts JSON file | location of the IdentityProviderAccounts the IdP uses as the account information for the user|
 
 Options are supplied using the standard Java command line system property syntax, for example (you only need to provide the options you need):
 
 ```
-java -Dfedcm.idp.rootdomain=fedcm-demo.org -Dserver.port=443 -Dfedcm.idp.hostname=fedcm-demo.org -Dserver.ssl.key-store=<something.p12> -Dserver.ssl.key-store-password=<password-for-key-store> -jar fedcm-multi/target/fedcm-multi-0.0.1-SNAPSHOT.jar
+java -Dfedcm.idp.rootdomain=idp.localhost:8080 -Dserver.port=8080 -Dfedcm.idp.hostname=idp.localhost:8080 -Dfedcm.rp.idpConfig=file:config.json -jar fedcm-multi/target/fedcm-multi-0.0.1-SNAPSHOT.jar
 
 ```
 

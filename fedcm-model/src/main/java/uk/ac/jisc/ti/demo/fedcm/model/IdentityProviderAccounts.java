@@ -17,6 +17,8 @@ package uk.ac.jisc.ti.demo.fedcm.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Holder for more than one {@link IdentityProviderAccount}].
@@ -25,7 +27,8 @@ public class IdentityProviderAccounts {
 
     private final List<IdentityProviderAccount> accounts;
 
-    public IdentityProviderAccounts(final List<IdentityProviderAccount> accounts) {
+    public IdentityProviderAccounts(
+    		@JsonProperty("accounts") final List<IdentityProviderAccount> accounts) {
         this.accounts = accounts;
     }
 

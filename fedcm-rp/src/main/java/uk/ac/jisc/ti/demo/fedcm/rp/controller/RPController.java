@@ -14,13 +14,16 @@
 
 package uk.ac.jisc.ti.demo.fedcm.rp.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.jisc.ti.demo.fedcm.model.CredentialRequestOptions;
@@ -45,40 +51,52 @@ public class RPController {
     /** Logger. */
     private static final Logger log = LoggerFactory.getLogger(RPController.class);
 
-    /** The hostname of the IdP to use for certain response fields. */
-    private final String hostname;
-
-    /** The root domain, where the well-known file is served. */
-    private final String rootDomain;
-
     /** The clientID. */
     private final String clientId;
 
     /** JSON Object Mapper. */
     private final ObjectMapper mapper;
-    
-    /** The url scheme. */
-    private final String scheme;
 
+    /** The loaded IdP configuration information.*/
+    private final CredentialRequestOptions credRequestOptions;
     /**
      * Constructor.
      * 
      * @param host the hostname
+     * @throws Exception on error loading the idp config
      */
-    public RPController(@Value("${fedcm.idp.hostname}") final String host,
-            @Value("${fedcm.idp.rootdomain}") final String root,
-            @Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier,
-            @Value("${fedcm.url.scheme:https://}") final String schemeIn) {
-        hostname = Objects.requireNonNull(host);
+    public RPController(@Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier,
+            @Value("${fedcm.rp.idpConfig}") final Resource idpConfig) throws Exception {
+       
         clientId = Objects.requireNonNull(clientIdentifier);
-        rootDomain = Objects.requireNonNull(root);
-        scheme = Objects.requireNonNull(schemeIn);
+        
+        // Load config. Fail if config fails
+        credRequestOptions = loadIdPConfig(idpConfig);
 
         mapper = new ObjectMapper();
-        log.info("++Started FedCM Relying Party using IdP host '{}'", host);
+        log.info("++Started FedCM Relying Party");
     }
 
     /**
+     * Load the idpConfig. 
+     * 
+     * @param idpConfig the idp config file
+     * @throws Exception if the file can not be read 
+     */
+    private CredentialRequestOptions loadIdPConfig(Resource idpConfig) throws Exception {
+		ObjectMapper om = new ObjectMapper();
+		if (!idpConfig.exists()) {
+			throw new IllegalArgumentException("IdPConfig file does not exist: " + idpConfig);
+		}
+		try (var stream = idpConfig.getInputStream()){
+			CredentialRequestOptions config = 
+					om.readValue(stream, CredentialRequestOptions.class);
+			log.info("Read IdentityProviderConfig: {}", config);
+			return config;
+		}
+	}
+
+	/**
      * Simple redirect to the main RP page.
      * 
      * @return a redirect to the RP page.
@@ -99,16 +117,11 @@ public class RPController {
         try {
             final String credOptionsSingle = mapper.writeValueAsString(buildCredentialRequestOptions());
             model.addAttribute("credentialRequestOptionsSingle", credOptionsSingle);
-            log.info("Created single CredentialsRequestOptions: {}", credOptionsSingle);
-
-            final String credOptionsMultiple =
-                    mapper.writeValueAsString(buildCredentialRequestOptionsMultipleProviders());
-            model.addAttribute("credentialRequestOptionsMultiple", credOptionsMultiple);
-            log.info("Created multiple CredentialsRequestOptions: {}", credOptionsMultiple);
+            log.info("Created CredentialsRequestOptions: {}", credOptionsSingle);
         } catch (final JsonProcessingException e) {
             log.error("Unable to write CredentialsRequestOptions to JSON string", e);
         }
-        model.addAttribute("rootDomain", rootDomain);
+        //model.addAttribute("rootDomain", rootDomain);
         return "rp";
     }
 
@@ -127,25 +140,8 @@ public class RPController {
 
     /** Build a credential request options. */
     private CredentialRequestOptions buildCredentialRequestOptions() {
-        final List<IdentityProviderConfig> configs = List.of(IdentityProviderConfig.builder()
-                .withConfigURL(scheme + hostname + "/fedcm.json").withClientId(clientId)
-                .withNonce(UUID.randomUUID().toString()).withScopes(List.of("profile", "scopes", "newscope")).build());
-
-        return CredentialRequestOptions.builder().withIdentity(IdentityCredentialRequestOptions.builder()
-                .withProviders(configs).withContext(IdentityCredentialRequestOptionsContext.CONTINUE).build()).build();
+        return credRequestOptions;
     }
 
-    /** Build a credential request options for multiple providers. */
-    private CredentialRequestOptions buildCredentialRequestOptionsMultipleProviders() {
-        final List<IdentityProviderConfig> configs = List.of(
-                IdentityProviderConfig.builder().withConfigURL(scheme + hostname + "/fedcm.json")
-                        .withClientId(clientId).withNonce(UUID.randomUUID().toString()).build(),
-                IdentityProviderConfig.builder().withConfigURL(scheme+"fedcm-idp-demo.glitch.me/fedcm.json")
-                        .withClientId(scheme+"fedcm-rp-demo.glitch.me").withNonce(UUID.randomUUID().toString())
-                        .build());
-
-        return CredentialRequestOptions.builder()
-                .withIdentity(IdentityCredentialRequestOptions.builder().withProviders(configs).build()).build();
-    }
 
 }

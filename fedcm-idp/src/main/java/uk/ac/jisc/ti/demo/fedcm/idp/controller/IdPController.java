@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +35,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import uk.ac.jisc.ti.demo.fedcm.model.CredentialRequestOptions;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
@@ -61,18 +65,45 @@ public class IdPController {
     
     /** The url scheme. */
     private final String scheme;
+    
+    /** The loaded accounts.*/
+    private final IdentityProviderAccounts accounts;
 
     /**
      * Constructor.
      * 
-     * @param host the hostname
+     * @param host the host
+     * @param schemeIn the URL scheme.
+     * @param accountsFile the JSON file to load accounts from
+     * @throws Exception if the accounts file fails to load
      */
     public IdPController(@Value("${fedcm.idp.hostname}") final String host, 
-    		@Value("${fedcm.url.scheme:https://}") final String schemeIn) {
-    	log.info("++Started FedCM Identity Provider for host '{}'", host);
+    		@Value("${fedcm.url.scheme:https://}") final String schemeIn,
+    		@Value("${fedcm.idp.idpAccounts}") final Resource accountsFile) throws Exception {
+    	log.info("++Started FedCM Identity Provider");
         hostname = Objects.requireNonNull(host);
         scheme = Objects.requireNonNull(schemeIn);
+        accounts = loadAccount(accountsFile);
     }
+    
+    /**
+     * Load the accounts for the mock user. 
+     * 
+     * @param accountsFile the idp accounts file
+     * @throws Exception if the file can not be read 
+     */
+    private IdentityProviderAccounts loadAccount(Resource accountsFile) throws Exception {
+		ObjectMapper om = new ObjectMapper();
+		if (!accountsFile.exists()) {
+			throw new IllegalArgumentException("Accounts file does not exist: " + accountsFile);
+		}
+		try (var stream = accountsFile.getInputStream()){
+			IdentityProviderAccounts accounts = 
+					om.readValue(stream, IdentityProviderAccounts.class);
+			log.info("Loaded IdentityProviderAccounts: {}", accounts);
+			return accounts;
+		}
+	}
 
     /**
      * Get a basic IdP Page for login and logout.
@@ -196,14 +227,10 @@ public class IdPController {
 	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(Collections.emptyList()));
         	
         } else {
-	        // Dummy response
-	        final IdentityProviderAccount account = IdentityProviderAccount.builder().withId("1234").withName("James Kirk")
-	                .withEmail("james.kirk@idp.example").withGivenName("James").withApprovedClients(List.of("1234"))
-	                .withPicture(scheme + hostname + "/images/kirk.ico").build();
+	        // Dummy response	
+	        log.info("IdentityProviderAccount response: '{}'", accounts);        
 	
-	        log.info("Built IdentityProviderAccount response: '{}'", account);        
-	
-	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(List.of(account)));
+	        return ResponseEntity.status(HttpStatus.OK).body(accounts);
         }
     }
     

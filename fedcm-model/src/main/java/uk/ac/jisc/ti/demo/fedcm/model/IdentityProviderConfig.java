@@ -18,11 +18,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeName("providers")
+@JsonDeserialize(builder = IdentityProviderConfig.Builder.class)
 public class IdentityProviderConfig {
 
     private final String configURL;
@@ -33,7 +40,7 @@ public class IdentityProviderConfig {
 
     private final String loginHint;
 
-    private final List<String> scopes;
+    private final List<String> scope;
 
     private final String responseType;
 
@@ -44,7 +51,7 @@ public class IdentityProviderConfig {
         this.clientId = builder.clientId;
         this.nonce = builder.nonce;
         this.loginHint = builder.loginHint;
-        this.scopes = builder.scopes;
+        this.scope = builder.scope;
         this.responseType = builder.responseType;
         this.params = builder.params;
     }
@@ -79,8 +86,8 @@ public class IdentityProviderConfig {
     }
 
     @JsonProperty("scope")
-    public List<String> getScopes() {
-        return scopes;
+    public List<String> getScope() {
+        return scope;
     }
 
     @JsonProperty("params")
@@ -112,7 +119,7 @@ public class IdentityProviderConfig {
     public interface IBuildStage {
         public IBuildStage withLoginHint(String loginHint);
 
-        public IBuildStage withScopes(List<String> scopes);
+        public IBuildStage withScope(List<String> scopes);
 
         public IBuildStage withResponseType(String responseType);
 
@@ -121,6 +128,7 @@ public class IdentityProviderConfig {
         public IdentityProviderConfig build();
     }
 
+    @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
     public static final class Builder implements IConfigURLStage, IClientIdStage, INonceStage, IBuildStage {
         private String configURL;
 
@@ -130,7 +138,7 @@ public class IdentityProviderConfig {
 
         private String loginHint;
 
-        private List<String> scopes = Collections.emptyList();
+        private List<String> scope = Collections.emptyList();
 
         private String responseType;
 
@@ -164,8 +172,8 @@ public class IdentityProviderConfig {
         }
 
         @Override
-        public IBuildStage withScopes(final List<String> scopes) {
-            this.scopes = scopes;
+        public IBuildStage withScope(final List<String> scopes) {
+            this.scope = scopes;
             return this;
         }
 
@@ -186,5 +194,12 @@ public class IdentityProviderConfig {
             return new IdentityProviderConfig(this);
         }
     }
+
+	@Override
+	public String toString() {
+		return "IdentityProviderConfig [configURL=" + configURL + ", clientId=" + clientId + ", nonce=" + nonce
+				+ ", loginHint=" + loginHint + ", scope=" + scope + ", responseType=" + responseType + ", params="
+				+ params + "]";
+	}
 
 }

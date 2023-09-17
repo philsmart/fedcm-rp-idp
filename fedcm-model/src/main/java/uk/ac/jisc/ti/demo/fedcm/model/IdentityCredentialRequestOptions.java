@@ -18,7 +18,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+@JsonDeserialize(builder = IdentityCredentialRequestOptions.Builder.class)
 public class IdentityCredentialRequestOptions {
 
 	private final List<IdentityProviderConfig> providers;
@@ -60,7 +63,7 @@ public class IdentityCredentialRequestOptions {
 		public IdentityCredentialRequestOptions build();
 	}
 
-
+	@JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
 	public static final class Builder implements IProvidersStage, IBuildStage {
 		private List<IdentityProviderConfig> providers = Collections.emptyList();
 		private IdentityCredentialRequestOptionsContext context = IdentityCredentialRequestOptionsContext.SIGNIN;
@@ -84,6 +87,13 @@ public class IdentityCredentialRequestOptions {
 		public IdentityCredentialRequestOptions build() {
 			return new IdentityCredentialRequestOptions(this);
 		}
+
 	}
+
+	@Override
+	public String toString() {
+		return "IdentityCredentialRequestOptions [providers=" + providers + ", context=" + context + "]";
+	}
+	
 
 }
