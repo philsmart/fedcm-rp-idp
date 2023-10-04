@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Relying Party FedCM Demo</title>
+<link rel="stylesheet" href="css/style-rp.css">
+
+<script th:inline="javascript">
+
+async function login() {
+    try {
+      const user_info = await IdentityProvider.getUserInfo(
+        {
+          configURL: "http://idp.localhost:8080/fedcm.json",
+          clientId: "https://test.rp.org/"
+        }
+      );
+
+      return user_info.length > 0 ? user_info[0] : null;
+
+    } catch (e) {
+      console.log("Cannot get user info");
+      console.log(e);
+      return null;
+    }
+  }
+  login();
+</script>
+
+
+</head>
+<body style="margin: 10px">
+
+ This is the personalised-button page
+</body>
+
+
+</html>

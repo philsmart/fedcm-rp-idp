@@ -59,6 +59,7 @@ public class RPController {
 
     /** The loaded IdP configuration information.*/
     private final CredentialRequestOptions credRequestOptions;
+    
     /**
      * Constructor.
      * 
@@ -88,6 +89,7 @@ public class RPController {
 		if (!idpConfig.exists()) {
 			throw new IllegalArgumentException("IdPConfig file does not exist: " + idpConfig);
 		}
+		log.info("Loading IdP config: {}", idpConfig);
 		try (var stream = idpConfig.getInputStream()){
 			CredentialRequestOptions config = 
 					om.readValue(stream, CredentialRequestOptions.class);

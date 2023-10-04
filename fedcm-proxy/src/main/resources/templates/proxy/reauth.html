@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Identity Provider Proxy FedCM Demo</title>
+    <link rel="stylesheet" href="../css/style-proxy.css">
+    <script src="../js/proxy.js" async></script>
+
+    <script th:if="${signedin}">
+        <!-- Will even be called if not inside the login window, but no harm -->
+        IdentityProvider.close();
+    </script>
+
+    <script th:inline="javascript">
+        async function login() {
+            try {
+
+                var idToken = await navigator.credentials.get([(${credentialRequestOptionsSingle})]);
+                console.log(`received token: ${idToken.token}`);
+                // Would need to forward this back to the caller. Not really possible.
+                window.location = "/proxy/login";
+
+            } catch (e) {
+                console.log(`rejected with ${e}`);
+            }
+        };
+
+        window.onload = function () {
+            login();
+        };
+
+        function end() {
+            IdentityProvider.close();
+        }
+    </script>
+
+</head>
+
+<body style="margin: 10px">
+
+    <div style="text-align: center">
+        <h1>Proxy Reauthentication</h1>
+    </div>
+</body>
+
+</html>

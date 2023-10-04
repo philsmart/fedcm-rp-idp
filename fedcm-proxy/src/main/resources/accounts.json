@@ -1,0 +1,19 @@
+{
+ "accounts": [{
+   "id": "1234",
+   "given_name": "Jim",
+   "name": "Jim Kirk",
+   "email": "jim.kirk@idp.example",
+   "picture": "http://idp.localhost:8080/images/kirk.ico",
+   "approved_clients": ["123", "456", "789"],
+   "login_hints": ["jim_kirk"]
+  }, {
+   "id": "5678",
+   "given_name": "Jim",
+   "name": "Jim Kirk Work",
+   "email": "jim.kirk.work@idp.example",
+   "picture": "http://idp.localhost:8080/images/me.ico",
+   "approved_clients": ["abc", "def", "ghi"],
+   "login_hints": ["email=johhny@idp.example", "id=5678"]
+  }]
+}

@@ -3,9 +3,9 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Identity Provider FedCM Demo</title>
-	<link rel="stylesheet" href="css/style-idp.css">
-	<script src="js/idp.js" async></script>
+	<title>Identity Provider Proxy FedCM Demo</title>
+	<link rel="stylesheet" href="../css/style-proxy.css">
+	<script src="../js/proxy.js" async></script>
 
 	<script th:if="${signedin}">
 		<!-- Will even be called if not inside the login window, but no harm -->
@@ -19,7 +19,7 @@
 	</ul>
 
 	<div style="text-align: center">
-		<h1>Identity Provider FedCM Demo</h1>
+		<h1>Identity Provider Proxy FedCM Demo</h1>
 
 	</div>
 	<div id="steps-outer">
@@ -32,11 +32,11 @@
 			</h2>
 		</div>
 		<div class="centre">
-			<a class="button centre" href="/idp/login">Sign-in</a>			
-			<a class="button" href="/idp/logout">Logout</a>
+			<a class="button centre" href="/proxy/login">Sign-in</a>			
+			<a class="button" href="/proxy/logout">Logout</a>
 		</div>
 		<div class="centre" style="margin-top:20px">
-			<a class="button centre" href="/idp/logoutIdPOnly">Invalidate IdP Session</a>			
+			<a class="button centre" href="/proxy/logoutIdPOnly">Invalidate IdP Session</a>			
 		</div>
 	</div>
 </body>

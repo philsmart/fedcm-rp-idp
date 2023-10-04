@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Identity Provider FedCM Demo</title>
+	<link rel="stylesheet" href="css/style-idp.css">
+	<script src="js/idp.js" async></script>
+	
+    <script th:if="${signedin}">
+        <!-- Will even be called if not inside the login window, but no harm -->
+        IdentityProvider.close();
+    </script>
+</head>
+
+<body style="margin: 10px">
+	<ul>
+		<li><a href="http://rp.localhost:8080/rp">RP Demo</a></li>
+	</ul>
+
+	<div style="text-align: center">
+		<h1>Identity Provider FedCM Demo</h1>
+
+	</div>
+	<div id="steps-outer">
+		<div style="text-align: center">
+			<h2>
+				<p th:if="${signedin}">Welcome back</p>
+			</h2>
+			<h2>
+				<p th:if="${signedin} == false">Please sign in</p>
+			</h2>
+		</div>
+		<div class="centre">
+			<a class="button centre" href="/idp/login">Sign-in</a>			
+			<a class="button" href="/idp/logout">Logout</a>
+		</div>
+		<div class="centre" style="margin-top:20px">
+			<a class="button centre" href="/idp/logoutIdPOnly">Invalidate IdP Session</a>			
+		</div>
+	</div>
+</body>
+<footer>
+	See the FedCM <a href="https://fedidcg.github.io/FedCM/">Sepcification</a>
+</footer>
+
+</html>

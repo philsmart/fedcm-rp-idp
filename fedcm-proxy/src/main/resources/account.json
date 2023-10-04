@@ -1,0 +1,11 @@
+{
+ "accounts": [{
+   "id": "1234",
+   "given_name": "Jim",
+   "name": "Jim Kirk",
+   "email": "jim.kirk@idp.example",
+   "picture": "http://idp.localhost:8080/images/kirk.ico",
+   "approved_clients": ["123", "456", "789"],
+   "login_hints": ["jim_kirk"]
+  }]
+}

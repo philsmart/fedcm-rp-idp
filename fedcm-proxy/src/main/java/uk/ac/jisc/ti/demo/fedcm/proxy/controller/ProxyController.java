@@ -12,7 +12,7 @@
  * permissions and limitations under the License.
  */
 
-package uk.ac.jisc.ti.demo.fedcm.idp.controller;
+package uk.ac.jisc.ti.demo.fedcm.proxy.controller;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,23 +45,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.jisc.ti.demo.fedcm.model.CredentialRequestOptions;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
-import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderBranding;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderClientMetadata;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderIcon;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
-import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
 
 /**
- * Mock FedCM IdP endpoints.
+ * Mock FedCM Proxy endpoints.
  */
 @Controller
-@RequestMapping("/idp")
-public class IdPController {
+@RequestMapping("/proxy")
+public class ProxyController {
 
     /** Logger. */
-    private static final Logger log = LoggerFactory.getLogger(IdPController.class);
+    private static final Logger log = LoggerFactory.getLogger(ProxyController.class);
 
     /** The hostname to use for certain response fields. */
     private final String hostname;
@@ -71,6 +69,12 @@ public class IdPController {
     
     /** The loaded accounts.*/
     private final IdentityProviderAccounts accounts;
+    
+    /** JSON Object Mapper. */
+    private final ObjectMapper mapper;
+    
+    /** The loaded IdP configuration information.*/
+    private final CredentialRequestOptions credRequestOptions;
 
     /**
      * Constructor.
@@ -80,25 +84,41 @@ public class IdPController {
      * @param accountsFile the JSON file to load accounts from
      * @throws Exception if the accounts file fails to load
      */
-    public IdPController(@Value("${fedcm.idp.hostname}") final String host, 
+    public ProxyController(@Value("${fedcm.proxy.hostname}") final String host, 
     		@Value("${fedcm.url.scheme:https://}") final String schemeIn,
-    		@Value("${fedcm.idp.idpAccounts}") final Resource accountsFile) throws Exception {
-    	log.info("++Started FedCM Identity Provider");
+    		@Value("${fedcm.proxy.idpAccounts}") final Resource accountsFile,
+    		@Value("${fedcm.downstream.idp.idpConfig}") final Resource idpConfig) throws Exception {
+    	log.info("++Started FedCM Proxy Identity Provider");
         hostname = Objects.requireNonNull(host);
         scheme = Objects.requireNonNull(schemeIn);
         accounts = loadAccount(accountsFile);
+        
+        mapper = new ObjectMapper();
+        
+        // Load config. Fail if config fails
+        credRequestOptions = loadIdPConfig(idpConfig);
     }
     
+    
     /**
-     * Return the personalised login button page.
+     * Load the idpConfig. 
      * 
-     * @return the personalised login button page
+     * @param idpConfig the idp config file
+     * @throws Exception if the file can not be read 
      */
-    @GetMapping("/login-button")
-    public String getLoginButton() {
-    	log.info("Getting login button");
-    	return "idp/login-button";
-    }
+    private CredentialRequestOptions loadIdPConfig(Resource idpConfig) throws Exception {
+		ObjectMapper om = new ObjectMapper();
+		if (!idpConfig.exists()) {
+			throw new IllegalArgumentException("IdPConfig file does not exist: " + idpConfig);
+		}
+		try (var stream = idpConfig.getInputStream()){
+			CredentialRequestOptions config = 
+					om.readValue(stream, CredentialRequestOptions.class);
+			log.info("Read IdentityProviderConfig: {}", config);
+			return config;
+		}
+	}
+    
     
     /**
      * Load the accounts for the mock user. 
@@ -134,13 +154,37 @@ public class IdPController {
     		model.addAttribute("signedin", false);
     	}
     	
-        return "idp/idp";
+        return "proxy/proxy";
     }
     
+    /**
+     * Reauthentication endpoint. Termed the Signin URL. For use when the browser thinks the user has logged in, but the
+     * IdP returns no accounts.
+     * 
+     * @param req the HTTP request
+     * @param model the model
+     * 
+     * @return the reauth view
+     */
     @GetMapping("/reauth")
     public String getSigninUrlIndex(final HttpServletRequest req, Model model) {    	
-        return "idp/reauth";
+    	try {
+            final String credOptionsSingle = mapper.writeValueAsString(credRequestOptions);
+            model.addAttribute("credentialRequestOptionsSingle", credOptionsSingle);
+            log.info("Created CredentialsRequestOptions: {}", credOptionsSingle);
+        } catch (final JsonProcessingException e) {
+            log.error("Unable to write CredentialsRequestOptions to JSON string", e);
+        }
+    	
+    	if (hasSession(req)) {
+    		model.addAttribute("signedin", true);
+    	} else {
+    		model.addAttribute("signedin", false);
+    	}
+    	
+        return "proxy/reauth";
     }
+    
     
     /**
      * Check if the user has a valid HTTP session. Also check the header to see if an override
@@ -175,7 +219,7 @@ public class IdPController {
         // Create a session cookie so you can see it being returned.
         req.getSession();
         resp.setHeader("IdP-SignIn-Status", "action=signin");
-        return "redirect:/idp";
+        return "redirect:/proxy";
     }
     
     /**
@@ -189,7 +233,7 @@ public class IdPController {
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
         resp.setHeader("IdP-SignIn-Status", "action=signout-all");
-        return "redirect:/idp";
+        return "redirect:/proxy";
     }
     
     /**
@@ -202,7 +246,7 @@ public class IdPController {
     @GetMapping("/logoutIdPOnly")
     public String getLogoutIdPOnly(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
-        return "redirect:/idp";
+        return "redirect:/proxy";
     }
 
     /**
@@ -214,9 +258,9 @@ public class IdPController {
     public ResponseEntity<IdentityProviderAPIConfig> getManifest() {
         // Dummy response
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
-                .withAccountsEndpoint("/idp/accounts").withClientMetadataEndpoint("/idp/client_metadata")
-                .withIdAssertionEndpoint("/idp/assertion")
-                .withSigninUrl("/idp/reauth")
+                .withAccountsEndpoint("/proxy/accounts").withClientMetadataEndpoint("/proxy/client_metadata")
+                .withIdAssertionEndpoint("/proxy/assertion")
+                .withSigninUrl("/proxy/reauth")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
                                 .withUrl(scheme + hostname + "/images/logo.ico").withSize(50).build()))
@@ -344,7 +388,6 @@ public class IdPController {
 	        return ResponseEntity.status(HttpStatus.OK).body(token);
     	}
     }
-
 
     /**
      * Get the value of a cookie.

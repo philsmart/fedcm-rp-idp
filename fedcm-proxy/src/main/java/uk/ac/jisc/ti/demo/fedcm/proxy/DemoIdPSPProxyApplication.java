@@ -11,20 +11,16 @@
  * ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package uk.ac.jisc.ti.demo.fedcm.multi;
+package uk.ac.jisc.ti.demo.fedcm.proxy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import uk.ac.jisc.ti.demo.fedcm.idp.controller.IdPController;
-import uk.ac.jisc.ti.demo.fedcm.proxy.controller.ProxyController;
-import uk.ac.jisc.ti.demo.fedcm.rp.controller.RPController;
+@SpringBootApplication
+public class DemoIdPSPProxyApplication {
 
-@SpringBootApplication(scanBasePackageClasses = {RPController.class, IdPController.class, ProxyController.class})
-public class FedCMIdPRpSpringBoot {
-	
 	public static void main(String[] args) {
-		SpringApplication.run(FedCMIdPRpSpringBoot.class, args);
+		SpringApplication.run(DemoIdPSPProxyApplication.class, args);
 	}
 
 }

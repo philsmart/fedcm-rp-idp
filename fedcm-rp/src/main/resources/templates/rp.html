@@ -41,6 +41,7 @@ async function login() {
 <body style="margin: 10px">
 		<ul>
 		<li><a href="http://idp.localhost:8080/idp">IdP Demo</a></li>
+		<li><a href="http://proxy.localhost:8080/proxy">Proxy Demo</a></li>
 	</ul>
 
 	<div style="text-align: center">
@@ -62,6 +63,9 @@ async function login() {
 		</ol>
 
 		<div style="text-align: center">
+           <!-- <iframe src="http://idp.localhost:8080/login-button" allow="identity-credentials-get">
+                
+            </iframe>-->
 			<button onclick="login()">Login (FedCM)</button>			
 		</div>
 	
