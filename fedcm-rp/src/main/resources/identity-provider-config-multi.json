@@ -13,5 +13,6 @@
 			"scope": []
 		}
 	],
+	"mode" : "button",
 	"context": "signin"
 }}

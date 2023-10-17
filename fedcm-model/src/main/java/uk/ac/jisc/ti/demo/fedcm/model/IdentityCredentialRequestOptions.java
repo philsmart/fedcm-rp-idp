@@ -28,72 +28,65 @@ public class IdentityCredentialRequestOptions {
 
 	private final IdentityCredentialRequestOptionsContext context;
 
-    /**
-     * @return the providers
-     */
-    @JsonProperty("providers")
-    public final List<IdentityProviderConfig> getProviders() {
-        return providers;
-    }
-    
-    @JsonProperty("context")
-    public final String getContext() {
-    	return context.getName();
-    }
+	private final String mode;
 
+	
 	private IdentityCredentialRequestOptions(Builder builder) {
 		this.providers = builder.providers;
 		this.context = builder.context;
+		this.mode = builder.mode;
 	}
 
+	/**
+	 * @return the providers
+	 */
+	@JsonProperty("providers")
+	public final List<IdentityProviderConfig> getProviders() {
+		return providers;
+	}
 
-	public static IProvidersStage builder() {
+	@JsonProperty("context")
+	public final String getContext() {
+		return context.getName();
+	}
+	
+	@JsonProperty("mode")
+	public final String getMode() {
+		return mode;
+	}
+
+	
+	public static Builder builder() {
 		return new Builder();
 	}
 
-
-	public interface IProvidersStage {
-		public IBuildStage withProviders(List<IdentityProviderConfig> providers);
-	}
-
-
-	public interface IBuildStage {
-		public IBuildStage withContext(IdentityCredentialRequestOptionsContext context);
-
-		public IdentityCredentialRequestOptions build();
-	}
-
 	@JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
-	public static final class Builder implements IProvidersStage, IBuildStage {
+	public static final class Builder {
 		private List<IdentityProviderConfig> providers = Collections.emptyList();
-		private IdentityCredentialRequestOptionsContext context = IdentityCredentialRequestOptionsContext.SIGNIN;
+		private IdentityCredentialRequestOptionsContext context;
+		private String mode;
 
 		private Builder() {
 		}
 
-		@Override
-		public IBuildStage withProviders(List<IdentityProviderConfig> providers) {
+		public Builder withProviders(List<IdentityProviderConfig> providers) {
 			this.providers = providers;
 			return this;
 		}
 
-		@Override
-		public IBuildStage withContext(IdentityCredentialRequestOptionsContext context) {
+		public Builder withContext(IdentityCredentialRequestOptionsContext context) {
 			this.context = context;
 			return this;
 		}
 
-		@Override
+		public Builder withMode(String mode) {
+			this.mode = mode;
+			return this;
+		}
+
 		public IdentityCredentialRequestOptions build() {
 			return new IdentityCredentialRequestOptions(this);
 		}
-
 	}
-
-	@Override
-	public String toString() {
-		return "IdentityCredentialRequestOptions [providers=" + providers + ", context=" + context + "]";
-	}
-	
 
 }
