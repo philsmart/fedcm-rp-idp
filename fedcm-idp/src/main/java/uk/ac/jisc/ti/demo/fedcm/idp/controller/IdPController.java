@@ -216,7 +216,7 @@ public class IdPController {
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
                 .withAccountsEndpoint("/idp/accounts").withClientMetadataEndpoint("/idp/client_metadata")
                 .withIdAssertionEndpoint("/idp/assertion")
-                .withSigninUrl("/idp/reauth")
+                .withLoginUrl("/idp/reauth")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
                                 .withUrl(scheme + hostname + "/images/logo.ico").withSize(50).build()))

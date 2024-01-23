@@ -28,7 +28,7 @@ public class IdentityProviderAPIConfig {
 
 	private final String idAssertionEndpoint;
 
-	private final String signinUrl;
+	private final String loginUrl;
 
 	private final IdentityProviderBranding branding;
 
@@ -37,7 +37,7 @@ public class IdentityProviderAPIConfig {
 		this.accountsEndpoint = builder.accountsEndpoint;
 		this.clientMetadataEndpoint = builder.clientMetadataEndpoint;
 		this.idAssertionEndpoint = builder.idAssertionEndpoint;
-		this.signinUrl = builder.signinUrl;
+		this.loginUrl = builder.loginUrl;
 		this.branding = builder.branding;
 	}
 	
@@ -68,9 +68,9 @@ public class IdentityProviderAPIConfig {
     /**
      * @return the idAssertionEndpoint
      */
-    @JsonGetter("signin_url")
-    public final String getSigninUrl() {
-        return signinUrl;
+    @JsonGetter("login_url")
+    public final String getLoginUrl() {
+        return loginUrl;
     }
 
     /**
@@ -103,7 +103,7 @@ public class IdentityProviderAPIConfig {
 
 	
 	public interface IBuildStage {
-		public IBuildStage withSigninUrl(String signinUrl);
+		public IBuildStage withLoginUrl(String loginUrl);
 
 		public IBuildStage withBranding(IdentityProviderBranding branding);
 
@@ -116,7 +116,7 @@ public class IdentityProviderAPIConfig {
 		private String accountsEndpoint;
 		private String clientMetadataEndpoint;
 		private String idAssertionEndpoint;
-		private String signinUrl;
+		private String loginUrl;
 		private IdentityProviderBranding branding;
 
 		private Builder() {
@@ -141,8 +141,8 @@ public class IdentityProviderAPIConfig {
 		}
 
 		@Override
-		public IBuildStage withSigninUrl(String signinUrl) {
-			this.signinUrl = signinUrl;
+		public IBuildStage withLoginUrl(String loginUrl) {
+			this.loginUrl = loginUrl;
 			return this;
 		}
 

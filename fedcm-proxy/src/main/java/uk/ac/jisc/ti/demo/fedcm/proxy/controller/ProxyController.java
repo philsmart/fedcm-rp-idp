@@ -260,7 +260,7 @@ public class ProxyController {
         final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
                 .withAccountsEndpoint("/proxy/accounts").withClientMetadataEndpoint("/proxy/client_metadata")
                 .withIdAssertionEndpoint("/proxy/assertion")
-                .withSigninUrl("/proxy/reauth")
+                .withLoginUrl("/proxy/reauth")
                 .withBranding(IdentityProviderBranding.builder().withBackgroundColor("red").withColor("0xFFEEAA")
                         .withIcons(List.of(IdentityProviderIcon.builder()
                                 .withUrl(scheme + hostname + "/images/logo.ico").withSize(50).build()))
