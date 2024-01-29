@@ -174,7 +174,7 @@ public class IdPController {
     public String getLogin(final HttpServletRequest req, final HttpServletResponse resp) {
         // Create a session cookie so you can see it being returned.
         req.getSession();
-        resp.setHeader("IdP-SignIn-Status", "action=signin");
+        resp.setHeader("Set-Login", "logged-in");
         log.info("Login request");
         return "redirect:/idp";
     }
