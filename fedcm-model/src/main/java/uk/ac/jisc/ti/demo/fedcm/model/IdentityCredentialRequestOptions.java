@@ -17,7 +17,9 @@ package uk.ac.jisc.ti.demo.fedcm.model;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -46,11 +48,13 @@ public class IdentityCredentialRequestOptions {
 	}
 
 	@JsonProperty("context")
+	@JsonInclude(Include.NON_EMPTY)
 	public final String getContext() {
-		return context.getName();
+		return context != null ? context.getName() : null;
 	}
 	
 	@JsonProperty("mode")
+	@JsonInclude(Include.NON_EMPTY)
 	public final String getMode() {
 		return mode;
 	}
@@ -59,6 +63,16 @@ public class IdentityCredentialRequestOptions {
 	public static Builder builder() {
 		return new Builder();
 	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "IdentityCredentialRequestOptions [providers=" + providers + ", context=" + context + ", mode=" + mode
+				+ "]";
+	}
+
+
 
 	@JsonPOJOBuilder(buildMethodName = "build", withPrefix = "with")
 	public static final class Builder {

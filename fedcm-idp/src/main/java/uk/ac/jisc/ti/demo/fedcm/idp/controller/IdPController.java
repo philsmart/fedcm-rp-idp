@@ -175,6 +175,7 @@ public class IdPController {
         // Create a session cookie so you can see it being returned.
         req.getSession();
         resp.setHeader("IdP-SignIn-Status", "action=signin");
+        log.info("Login request");
         return "redirect:/idp";
     }
     
@@ -189,6 +190,7 @@ public class IdPController {
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
         resp.setHeader("IdP-SignIn-Status", "action=signout-all");
+        log.info("Logout event");
         return "redirect:/idp";
     }
     
@@ -202,6 +204,7 @@ public class IdPController {
     @GetMapping("/logoutIdPOnly")
     public String getLogoutIdPOnly(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
+        log.info("Invalidate session");
         return "redirect:/idp";
     }
 

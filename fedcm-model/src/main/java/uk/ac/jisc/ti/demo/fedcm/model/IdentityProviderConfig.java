@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeName("providers")
+@JsonPropertyOrder({ "registered, configURL, clientId, nonce, loginHint, scope, responseType, params"})
 @JsonDeserialize(builder = IdentityProviderConfig.Builder.class)
 public class IdentityProviderConfig {
 
@@ -45,6 +47,8 @@ public class IdentityProviderConfig {
     private final String responseType;
 
     private final Map<String, String> params;
+    
+    private final boolean registered;
 
     private IdentityProviderConfig(final Builder builder) {
         this.configURL = builder.configURL;
@@ -54,6 +58,13 @@ public class IdentityProviderConfig {
         this.scope = builder.scope;
         this.responseType = builder.responseType;
         this.params = builder.params;
+        this.registered = builder.registered;
+    }
+    
+    // Ignore if false
+    @JsonProperty("registered")
+    public Boolean getRegistered() {
+    	return registered ? registered : null;
     }
 
     /**
@@ -95,6 +106,7 @@ public class IdentityProviderConfig {
     public Map<String, String> getParams() {
         return params;
     }
+
 
     public String getResponseType() {
         return responseType;
@@ -143,6 +155,8 @@ public class IdentityProviderConfig {
         private String responseType;
 
         private Map<String, String> params = Collections.emptyMap();
+        
+        private boolean registered;
 
         private Builder() {
         }
@@ -188,6 +202,11 @@ public class IdentityProviderConfig {
             this.params = params;
             return this;
         }
+        
+        public IBuildStage withRegistered(final boolean registered) {
+            this.registered = registered;
+            return this;
+        }
 
         @Override
         public IdentityProviderConfig build() {
@@ -199,7 +218,9 @@ public class IdentityProviderConfig {
 	public String toString() {
 		return "IdentityProviderConfig [configURL=" + configURL + ", clientId=" + clientId + ", nonce=" + nonce
 				+ ", loginHint=" + loginHint + ", scope=" + scope + ", responseType=" + responseType + ", params="
-				+ params + "]";
+				+ params + ", registered=" + registered + "]";
 	}
+
+
 
 }
