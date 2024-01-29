@@ -189,7 +189,7 @@ public class IdPController {
     @GetMapping("/logout")
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
-        resp.setHeader("IdP-SignIn-Status", "action=signout-all");
+        resp.setHeader("Set-Logins", "logged-out");
         log.info("Logout event");
         return "redirect:/idp";
     }
