@@ -19,7 +19,7 @@
                 var idToken = await navigator.credentials.get([(${credentialRequestOptionsSingle})]);
                 console.log(`received token: ${idToken.token}`);
                 // Would need to forward this back to the caller. Not really possible.
-                window.location = "/proxy/login";
+                window.location = "/proxy/login?token="+idToken.token;
 
             } catch (e) {
                 console.log(`rejected with ${e}`);

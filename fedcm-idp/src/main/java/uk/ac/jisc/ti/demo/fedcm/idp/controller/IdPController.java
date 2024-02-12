@@ -171,16 +171,21 @@ public class IdPController {
      * @return the IdP homepage
      */
     @GetMapping("/login")
-    public String getLogin(final HttpServletRequest req, final HttpServletResponse resp) {
+    public String getLogin(final HttpServletRequest req, final HttpServletResponse resp,
+    		@RequestHeader final Map<String, String> headers,
+            @RequestParam final Map<String, String> allRequestParams) {
+    	logCookiesAndHeaders(req, headers, allRequestParams);
         // Create a session cookie so you can see it being returned.
-        req.getSession();
+        if (!hasSession(req)) {
+        	req.getSession();
+        }
         resp.setHeader("Set-Login", "logged-in");
         log.info("Login request");
         return "redirect:/idp";
     }
     
     /**
-     * Logout of the IdP. Simply remove their session and send browser IdP-SignIn-Status action=signout-all.
+     * Logout of the IdP. Simply remove their session and send browser Set-Login=logged-out.
      * 
      * 
      * @param req the http request
@@ -189,7 +194,7 @@ public class IdPController {
     @GetMapping("/logout")
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
-        resp.setHeader("Set-Logins", "logged-out");
+        resp.setHeader("Set-Login", "logged-out");
         log.info("Logout event");
         return "redirect:/idp";
     }

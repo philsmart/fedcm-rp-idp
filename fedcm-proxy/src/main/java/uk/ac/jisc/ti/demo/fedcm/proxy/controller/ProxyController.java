@@ -215,15 +215,24 @@ public class ProxyController {
      * @return the IdP homepage
      */
     @GetMapping("/login")
-    public String getLogin(final HttpServletRequest req, final HttpServletResponse resp) {
+    public String getLogin(final HttpServletRequest req, final HttpServletResponse resp,
+    			@RequestParam(name="token", required=false) final String token,
+    			@RequestHeader final Map<String, String> headers,
+                @RequestParam final Map<String, String> allRequestParams) {
+    	logCookiesAndHeaders(req, headers, allRequestParams);
         // Create a session cookie so you can see it being returned.
-        req.getSession();
-        resp.setHeader("IdP-SignIn-Status", "action=signin");
+    	log.info("Token in request is '{}'", token);
+    	if (!hasSession(req)) {
+        	req.getSession();
+        }
+        req.getSession().setAttribute("upstream-token", token);
+        log.info("Set token from upstream IdP '{}'", req.getAttribute("upstream-token"));
+        resp.setHeader("Set-Login", "logged-in");
         return "redirect:/proxy";
     }
     
     /**
-     * Logout of the IdP. Simply remove their session and send browser IdP-SignIn-Status action=signout-all.
+     * Logout of the IdP. Simply remove their session and send browser Set-Login=logged-out.
      * 
      * 
      * @param req the http request
@@ -232,7 +241,7 @@ public class ProxyController {
     @GetMapping("/logout")
     public String getLogout(final HttpServletRequest req, final HttpServletResponse resp) {
         req.getSession().invalidate();
-        resp.setHeader("IdP-SignIn-Status", "action=signout-all");
+        resp.setHeader("Set-Login", "logged-out");
         return "redirect:/proxy";
     }
     
@@ -377,12 +386,15 @@ public class ProxyController {
 	                IdentityProviderToken.builder().withToken("").build();
     		return ResponseEntity.status(HttpStatus.OK).body(token);
     	} else {
-	        // Dummy response
-	        final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-	                + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-	                + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+	        // pull token from session if one exits, else return nothing
+    		Object tokenFromSession = req.getSession().getAttribute("upstream-token");
+    		
 	        final IdentityProviderToken token =
-	                IdentityProviderToken.builder().withToken(dummyJWT).build();
+	                IdentityProviderToken.builder()
+	                .withToken((tokenFromSession instanceof String tString ? tString : "")).build();
+	        
+	        // Assume the proxy does not store session state
+	        req.getSession().removeAttribute("upstream-token");
 	
 	        log.info("Built IdentityProviderToken: '{}'", token);
 	        return ResponseEntity.status(HttpStatus.OK).body(token);
