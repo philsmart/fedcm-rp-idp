@@ -158,4 +158,14 @@ public class IdentityProviderAPIConfig {
 		}
 	}
 
+
+	@Override
+	public String toString() {
+		return "IdentityProviderAPIConfig [accountsEndpoint=" + accountsEndpoint + ", clientMetadataEndpoint="
+				+ clientMetadataEndpoint + ", idAssertionEndpoint=" + idAssertionEndpoint + ", loginUrl=" + loginUrl
+				+ ", branding=" + branding + "]";
+	}
+	
+	
+
 }
