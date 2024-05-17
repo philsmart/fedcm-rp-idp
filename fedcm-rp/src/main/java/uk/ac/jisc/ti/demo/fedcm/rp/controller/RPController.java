@@ -66,8 +66,8 @@ public class RPController {
      * @param host the hostname
      * @throws Exception on error loading the idp config
      */
-    public RPController(@Value("${fedcm.rp.clientid:https://test.rp.org/}") final String clientIdentifier,
-            @Value("${fedcm.rp.idpConfig}") final Resource idpConfig) throws Exception {
+    public RPController(@Value("${fedcm.rp.clientid:https://rp.localhost:8080/}") final String clientIdentifier,
+            @Value("${fedcm.rp.idpConfig:classpath:/identity-provider-config.json}") final Resource idpConfig) throws Exception {
        
         clientId = Objects.requireNonNull(clientIdentifier);
         

@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -58,6 +59,7 @@ import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
  */
 @Controller
 @RequestMapping("/idp")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class IdPController {
 
     /** Logger. */
@@ -138,7 +140,14 @@ public class IdPController {
     }
     
     @GetMapping("/reauth")
-    public String getSigninUrlIndex(final HttpServletRequest req, Model model) {    	
+    public String getSigninUrlIndex(final HttpServletRequest req, Model model) {  
+    	if (hasSession(req)) {
+    		final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+	                + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+	                + ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    		log.info("Signed in, redirecting back to: {}", "http://proxy.localhost:8080/proxy/acs");
+    		return "redirect:http://proxy.localhost:8080/proxy/acs?token="+dummyJWT;
+    	}
         return "idp/reauth";
     }
     
@@ -155,10 +164,10 @@ public class IdPController {
     		return true;
     	}
     	if (req.getSession(false) != null) {
-    		log.trace("User has a session", req.getSession(false).getId());
+    		log.info("User has a session {}", req.getSession(false).getId());
     		return true;
     	} else {
-    		log.trace("User does not have a session");
+    		log.info("User does not have a session");
     		return false;
     	}
     }
@@ -245,7 +254,7 @@ public class IdPController {
             @RequestHeader final Map<String, String> headers,
             @RequestParam final Map<String, String> allRequestParams) {
         
-        checkRequestValidity(req, headers);
+        checkRequestValidity(req, headers, false);
         logCookiesAndHeaders(req, headers, allRequestParams);
         
         if (!hasSession(req)) {
@@ -275,6 +284,8 @@ public class IdPController {
         if (req.getCookies() != null) {
             Arrays.stream(req.getCookies())
                     .forEach(c -> log.info("FedCM Account Cookie: {}:{}", c.getName(), c.getValue()));
+        } else {
+        	log.info("FedCM sent no cookies");
         }
 
         headers.entrySet().forEach(h -> log.info("FedCM Account Header: {}", h));        
@@ -289,10 +300,25 @@ public class IdPController {
      * @param headers the HTTP headers
      */
     private void checkRequestValidity(@Nonnull final HttpServletRequest req,
-    		@Nonnull final Map<String, String> headers) {
+    		@Nonnull final Map<String, String> headers, final boolean withOrigin) {
     	
     	if (!"webidentity".equals(headers.get("sec-fetch-dest"))) {
     		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sec-Fetch-Dest header is not webidentity");
+    	}
+    	if (withOrigin) {
+	    	// TODO check origin against client_id
+	    	final String origin = headers.get("origin");
+	    	final String clientId = req.getParameter("client_id");
+	    	if (origin == null) {
+	    		// fail!
+	    		log.info("Can not find origin header!");
+	    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "origin header found");
+	    	}
+	    	if (!origin.equals(clientId)) {
+	    		// Maybe too strict for this match
+	    		log.info("Origin '{}' does not match clientId '{}'", origin, clientId);
+	    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Origin does not match clientId!");
+	    	}
     	}
     }
 
@@ -308,7 +334,7 @@ public class IdPController {
     public ResponseEntity<IdentityProviderClientMetadata> getClientMetadata(final HttpServletRequest req,
             @RequestHeader final Map<String, String> headers) {
     	
-    	checkRequestValidity(req, headers);
+    	checkRequestValidity(req, headers, false);
         // Dummy response
         final IdentityProviderClientMetadata metadata =
                 IdentityProviderClientMetadata.builder().withPrivacyPolicyUrl("https://" + hostname + "/privacy.html")
@@ -334,6 +360,7 @@ public class IdPController {
             @RequestParam final Map<String, String> allRequestParams) {
     	
     	logCookiesAndHeaders(req, headers, allRequestParams);
+    	checkRequestValidity(req, headers, true);
     	
     	if (!hasSession(req)) {
     		log.info("No session and not assertion");
@@ -348,7 +375,13 @@ public class IdPController {
 	        final IdentityProviderToken token =
 	                IdentityProviderToken.builder().withToken(dummyJWT).build();
 	
-	        log.info("Built IdentityProviderToken: '{}'", token);
+	        
+	        try {
+	        	ObjectMapper om = new ObjectMapper();
+				log.info("Built IdentityProviderToken: '{}'", om.writeValueAsString(token));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 	        return ResponseEntity.status(HttpStatus.OK).body(token);
     	}
     }

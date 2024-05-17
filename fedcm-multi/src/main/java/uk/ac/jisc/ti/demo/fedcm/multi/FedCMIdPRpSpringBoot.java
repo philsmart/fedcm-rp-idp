@@ -20,7 +20,7 @@ import uk.ac.jisc.ti.demo.fedcm.idp.controller.IdPController;
 import uk.ac.jisc.ti.demo.fedcm.proxy.controller.ProxyController;
 import uk.ac.jisc.ti.demo.fedcm.rp.controller.RPController;
 
-@SpringBootApplication(scanBasePackageClasses = {RPController.class, IdPController.class, ProxyController.class})
+@SpringBootApplication(scanBasePackageClasses = {RPController.class, IdPController.class, ProxyController.class, ConfigureBeans.class})
 public class FedCMIdPRpSpringBoot {
 	
 	public static void main(String[] args) {

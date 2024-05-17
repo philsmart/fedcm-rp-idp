@@ -2,7 +2,7 @@
 	"providers": [
 		{
 			"configURL": "http://idp.localhost:8081/fedcm.json",
-			"clientId": "https://test.rp.org/",
+			"clientId": "http://rp.localhost:8080/",
 			"nonce": "c9681de7-d5f0-454d-baed-424bd7900ff5",
 			"scope": []
 		},

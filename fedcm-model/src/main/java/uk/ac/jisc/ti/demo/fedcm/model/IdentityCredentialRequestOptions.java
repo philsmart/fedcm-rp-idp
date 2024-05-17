@@ -31,12 +31,15 @@ public class IdentityCredentialRequestOptions {
 	private final IdentityCredentialRequestOptionsContext context;
 
 	private final String mode;
+	
+	private final String mediation;
 
 	
 	private IdentityCredentialRequestOptions(Builder builder) {
 		this.providers = builder.providers;
 		this.context = builder.context;
 		this.mode = builder.mode;
+		this.mediation = builder.mediation;
 	}
 
 	/**
@@ -57,6 +60,12 @@ public class IdentityCredentialRequestOptions {
 	@JsonInclude(Include.NON_EMPTY)
 	public final String getMode() {
 		return mode;
+	}
+	
+	@JsonProperty("mediation")
+	@JsonInclude(Include.NON_EMPTY)
+	public String getMediation() {
+		return mediation;
 	}
 
 	
@@ -79,6 +88,7 @@ public class IdentityCredentialRequestOptions {
 		private List<IdentityProviderConfig> providers = Collections.emptyList();
 		private IdentityCredentialRequestOptionsContext context;
 		private String mode;
+		private String mediation;
 
 		private Builder() {
 		}
@@ -95,6 +105,11 @@ public class IdentityCredentialRequestOptions {
 
 		public Builder withMode(String mode) {
 			this.mode = mode;
+			return this;
+		}
+		
+		public Builder withMediation(String mediation) {
+			this.mediation = mediation;
 			return this;
 		}
 
