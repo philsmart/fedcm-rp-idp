@@ -5,27 +5,19 @@
     <meta charset="UTF-8">
     <title>Identity Provider Proxy FedCM Demo</title>
     <link rel="stylesheet" href="../css/style-proxy.css">
-    <script src="../js/proxy.js" async></script>
-    
-      <script th:if="${signedin}">
-        <!-- Will even be called if not inside the login window, but no harm -->
-        console.log("closed IdP");
-        IdentityProvider.close();
-    </script>
-
 
 </head>
 
 <body style="margin: 10px">
 
     <div style="text-align: center">
-        <h1>Identity Provider Sign in</h1>
+        <h1>Identity Provider — Requires Multi-Factor</h1>
     </div>
 
     <div id="steps-outer">
         <div style="text-align: center">
             <div class="centre">
-                <a class="button centre" href="/idp/login">Sign-in</a>
+                <a class="button centre" href="/idp/2fasuccess">2FA</a>
             </div>
         </div>
 </body>

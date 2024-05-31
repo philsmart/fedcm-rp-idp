@@ -2,16 +2,15 @@
 	"providers": [
 		{
 			"configURL": "http://idp.localhost:8080/idp/fedcm.json",
-			"clientId": "https://test.proxy.org/",
+			"clientId": "http://rp.localhost:8080",
 			"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025",
-			"scope": [
-				"profile",
-				"scopes",
-				"newscope"
-			]
+			"params" : {
+                "AuthnContextClassRef" : "http://example.org/ac/classes/mfa"
+            }
+			
 		}
 	],
-	"mode" : "button",
+	"mode" : "widget",
 	"context": "continue"
 }}
   

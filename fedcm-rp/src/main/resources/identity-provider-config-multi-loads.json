@@ -1,0 +1,11 @@
+{"identity":{
+	"providers": [
+		{
+			"configURL": "any",
+			"clientId": "http://rp.localhost:8080/",
+			"nonce": "c9681de7-d5f0-454d-baed-424bd7900ff5",
+			"scope": []
+		}
+	],
+	"mode" : "button"
+}}

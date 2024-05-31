@@ -19,3 +19,11 @@ async function logout() {
 	}
 };
 
+function registerIdP(){
+    IdentityProvider.register('http://idp.localhost:8080/idp/fedcm.json');
+}
+
+function unregisterIdP(){
+     IdentityProvider.unregister('http://idp.localhost:8080/idp/fedcm.json');
+}
+

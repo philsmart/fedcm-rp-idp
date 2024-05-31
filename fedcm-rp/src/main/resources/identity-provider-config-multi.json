@@ -5,9 +5,9 @@
 			"clientId": "http://rp.localhost:8080/",
 			"nonce": "c9681de7-d5f0-454d-baed-424bd7900ff5",
 			"scope": []
-		},
+		},		
 		{
-			"configURL": "http://idp2.localhost:8082/fedcm.json",
+			"configURL": "http://idp3.localhost:8082/fedcm.json",
 			"clientId": "http://fedcm-rp-demo.glitch.me",
 			"nonce": "33afb614-7141-4b07-abf8-dd5e9bc16022",
 			"scope": []

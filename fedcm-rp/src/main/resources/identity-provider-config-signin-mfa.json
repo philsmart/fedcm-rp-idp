@@ -1,0 +1,15 @@
+{"identity":{
+	"providers": [
+		{
+			"configURL": "http://idp.localhost:8080/idp/fedcm.json",
+			"clientId": "http://rp.localhost:8080/",
+			"params" : {
+                "AuthnContextClassRef" : "http://example.org/ac/classes/mfa"
+            }
+		}
+	],
+	"mode" : "widget",
+	"context": "continue"
+}}
+  
+  

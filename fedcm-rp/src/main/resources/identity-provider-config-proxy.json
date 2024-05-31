@@ -3,15 +3,10 @@
 		{
 			"configURL": "http://proxy.localhost:8080/proxy/fedcm.json",
 			"clientId": "http://rp.localhost:8080/",
-			"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025",
-			"scope": [
-				"profile",
-				"scopes",
-				"newscope"
-			]
+			"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025"
 		}
 	],
-	"mode" : "button",
+	"mode" : "widget",
 	"context": "continue"
 }}
   

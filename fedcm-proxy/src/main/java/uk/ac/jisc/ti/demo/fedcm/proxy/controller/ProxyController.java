@@ -75,6 +75,9 @@ public class ProxyController {
     
     /** The loaded IdP configuration information.*/
     private final CredentialRequestOptions credRequestOptions;
+    
+    /** If true, use redirect based proxy rather than a page with fedCM.*/
+    private boolean redirectMode;
 
     /**
      * Constructor.
@@ -84,14 +87,16 @@ public class ProxyController {
      * @param accountsFile the JSON file to load accounts from
      * @throws Exception if the accounts file fails to load
      */
-    public ProxyController(@Value("${fedcm.proxy.hostname}") final String host, 
+    public ProxyController(@Value("${fedcm.proxy.hostname:localhost}") final String host, 
     		@Value("${fedcm.url.scheme:https://}") final String schemeIn,
-    		@Value("${fedcm.proxy.idpAccounts}") final Resource accountsFile,
-    		@Value("${fedcm.downstream.idp.idpConfig}") final Resource idpConfig) throws Exception {
+    		@Value("${fedcm.proxy.idpAccounts:classpath:/account.json}") final Resource accountsFile,
+    		@Value("${fedcm.downstream.idp.idpConfig:classpath:/identity-provider-config.json}") final Resource idpConfig,
+    		@Value("${fedcm.proxy.redirectMode:false}") final Boolean redirectMode) throws Exception {
     	log.info("++Started FedCM Proxy Identity Provider");
         hostname = Objects.requireNonNull(host);
         scheme = Objects.requireNonNull(schemeIn);
         accounts = loadAccount(accountsFile);
+        this.redirectMode = redirectMode;
         
         mapper = new ObjectMapper();
         
@@ -155,6 +160,20 @@ public class ProxyController {
     	}
     	
         return "proxy/proxy";
+    }    
+    
+    /**
+     * Get a result from an upstream IdP
+     * 
+     * @param req
+     * @param model
+     * @return
+     */
+    @GetMapping("/acs")
+    public String assertionConsumerService(final HttpServletRequest req, Model model, @RequestParam(name="token", required=false) final String token) {
+    	log.info("Have token at ACS: {}", token);
+    	req.getSession().setAttribute("upstream-token", token);
+        return "redirect:/proxy/login?token="+token;
     }
     
     /**
@@ -167,7 +186,10 @@ public class ProxyController {
      * @return the reauth view
      */
     @GetMapping("/reauth")
-    public String getSigninUrlIndex(final HttpServletRequest req, Model model) {    	
+    public String getSigninUrlIndex(final HttpServletRequest req, Model model) {    
+    	if (redirectMode) {
+    		return "redirect:http://idp.localhost:8080/idp/reauth";
+    	}
     	try {
             final String credOptionsSingle = mapper.writeValueAsString(credRequestOptions);
             model.addAttribute("credentialRequestOptionsSingle", credOptionsSingle);
@@ -225,8 +247,10 @@ public class ProxyController {
     	if (!hasSession(req)) {
         	req.getSession();
         }
-        req.getSession().setAttribute("upstream-token", token);
-        log.info("Set token from upstream IdP '{}'", req.getAttribute("upstream-token"));
+    	if (token != null) {
+	        req.getSession().setAttribute("upstream-token", token);	        
+	        log.info("Set token from upstream IdP '{}'", req.getAttribute("upstream-token"));
+    	}
         resp.setHeader("Set-Login", "logged-in");
         return "redirect:/proxy";
     }

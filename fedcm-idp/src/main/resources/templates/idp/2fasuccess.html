@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Identity Provider Proxy FedCM Demo</title>
+    <link rel="stylesheet" href="../css/style-proxy.css">
+    
+      <script>
+        function authnSuccess(){
+            IdentityProvider.resolve("[[${token}]]");
+        }
+    </script>
+
+
+</head>
+
+<body style="margin: 10px" onload="authnSuccess()")>
+
+    <div style="text-align: center">
+        <h1>2FA Success</h1>
+        <span th:text="${token}"></span>
+    </div>
+
+</body>
+
+</html>
