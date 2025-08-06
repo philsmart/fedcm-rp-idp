@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Relying Party FedCM Demo</title>
+    <link rel="stylesheet" href="css/style-rp.css">
+
+    <script>
+        let button = document.getElementById("cscac");
+        async function login() {
+        navigator.credentials
+          .get({
+            identity: {
+              providers: [
+                {
+                  origin: "http://idp.localhost:8080",
+                  loginURL: "http://idp.localhost:8080/idp/idplw"
+                },
+              ],
+            },
+          })
+          .then((cred) => {
+            if (cred) {
+              console.log("Worked: "+cred.token)
+              console.log(cred.tokenURL)
+              let tokenArea = document.getElementById("token");
+              tokenArea.textContent = cred.token;
+                
+            } else {
+              console.log("failed")
+            }
+          });
+          
+         
+      };
+      
+        
+    </script>
+    <script type="text/javascript" th:inline="javascript" th:src="@{js/rp.js}"></script>
+
+</head>
+
+<body style="margin: 10px">
+
+
+    <div style="text-align: center">
+        <h1>Relying Party Lightweight FedCM Demo</h1>
+        <h3>
+            See the FedCM <a href="https://fedidcg.github.io/FedCM/">Specification</a>
+        </h3>
+    </div>
+
+    <div id="steps-outer">
+       
+
+        <div style="text-align: center">
+            <button id="cscac" onclick="login()">Login via IDP.com</button>
+            <textarea id="token"></textarea>
+        </div>
+
+       
+
+    </div>
+
+
+
+</body>
+
+
+</html>

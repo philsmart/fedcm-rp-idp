@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Google Sign-In Demo</title>
+    <link rel="stylesheet" href="css/style-rp.css">
+
+    </script>
+    <script type="text/javascript" th:inline="javascript" th:src="@{js/rp.js}"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+
+<div style="text-align: center">
+    <h1>Google Sign-In Demo</h1>
+
+</div>
+
+<div id="steps-outer">
+
+
+    <div style="text-align: center">
+        <div id="g_id_onload" data-client_id="429927884003-omr9f6h07egubaq263flmgs3l7vu1q6b.apps.googleusercontent.com"
+            data-context="signin" data-ux_mode="popup" data-callback="callback" data-nonce="" data-auto_prompt="false"
+            data-login_uri="http://localhost:8080/google-sign-in-callback"
+        </div>
+
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+            data-text="signin_with" data-size="large" data-logo_alignment="left">
+        </div>
+    </div>
+
+</div>
+
+
+</div>
+
+
+</body>
+
+
+</html>

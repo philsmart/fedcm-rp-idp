@@ -1,82 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>Relying Party FedCM Demo</title>
-<link rel="stylesheet" href="css/style-rp.css">
+    <meta charset="UTF-8">
+    <title>Relying Party FedCM Demo</title>
+    <link rel="stylesheet" href="css/style-rp.css">
+    <script src="https://service.seamlessaccess.org/thiss.js"></script>
+    <script th:inline="javascript">
 
-<script th:inline="javascript">
+        function isFedCMEnabled() {
+            return !!window.IdentityCredential;
+        }
+        //console.log(isFedCMEnabled() ? "Modern FedCM is available" : "Modern FedCM is not available");
 
-function isFedCMEnabled() {
-	  return !!window.IdentityCredential;
-}
-	console.log(isFedCMEnabled() ? "Modern FedCM is available" : "Modern FedCM is not available");
+        function isOldFedCMEnabled() {
+            return !(!window.FederatedCredential || !FederatedCredential.prototype.login);
+        }
+        //console.log(isOldFedCMEnabled() ? "Old FedCM is available" : "Old FedCM is not available");
 
-function isOldFedCMEnabled() {
-	  return !(!window.FederatedCredential || !FederatedCredential.prototype.login);
-}
-console.log(isOldFedCMEnabled() ? "Old FedCM is available" : "Old FedCM is not available");
+        async function login() {
+            try {
+                if (!isOldFedCMEnabled() && !isFedCMEnabled()) {
+                    return;
+                }
 
-async function login() {
-  try {
-    if (!isOldFedCMEnabled() && !isFedCMEnabled()) {
-      return;
-    }
+                var idToken = await navigator.credentials.get([(${credentialRequestOptionsSingle})]);
+                document.getElementById('token').innerHTML = idToken.token;
+                console.log(`received token: ${idToken.token}`);
+                document.getElementById('tokenpost').value = idToken.token;
+                setTimeout(() => {
+                    document.getElementById('tokensubmit').click();
+                }, 2000);
 
-    var idToken = await navigator.credentials.get([(${credentialRequestOptionsSingle})]);
-	document.getElementById('token').innerHTML = idToken.token;
-    console.log(`received token: ${idToken.token}`);
-    
-  } catch (e) {
-    console.log(`rejected with ${e}`);
-  }
-};
+            } catch (e) {
+                console.log(`rejected with ${e}`);
+            }
+        };
 
-</script>
-<script type="text/javascript" th:inline="javascript"
-	th:src="@{js/rp.js}"></script>
+        window.onload = function () {
+            var idpSelected = [(${idpSelected})];
+            var authenticated = [(${authenticated})];
+            if (authenticated == false && idpSelected == false) {
+                thiss.DiscoveryComponent({
+                    loginInitiatorURL: 'http://rp.localhost:8081/rp/ds?target=http://rp.localhost:8081',
+                }).render('#login');
+            }
 
+            if (idpSelected == true && authenticated == false) {
+                console.log("IdP already selected");
+                //login();
+            }
+        };
+
+    </script>
+    <script type="text/javascript" th:inline="javascript" th:src="@{js/rp.js}"></script>
 
 </head>
+
 <body style="margin: 10px">
-		<ul>
-		<li><a href="http://idp.localhost:8080/idp">IdP Demo</a></li>
-		<li><a href="http://proxy.localhost:8080/proxy">Proxy Demo</a></li>
-	</ul>
+    <ul>
+        <li><a href="http://idp.localhost:8080/idp">IdP Demo</a></li>
+        <li><a href="http://proxy.localhost:8080/proxy">Proxy Demo</a></li>
 
-	<div style="text-align: center">
-		<h1>Relying Party FedCM Demo</h1>
-		<h3>
-			See the FedCM <a href="https://fedidcg.github.io/FedCM/">Specification</a>
-		</h3>
-	</div>
+    </ul>
 
-	<div id="steps-outer">
-		<h4 style="text-align: center">FedCM Login Steps
-			(navigator.credentials.get())</h4>
-		<ol>
-			<li>GET Request to the well-known web identity file: .well-known/web-identity</li>
-			<li>GET Request to the config endpoint: fedcm.json</li>
-			<li>GET Request to the accounts endpoint: idp/accounts</li>
-			<li>GET Request to the metadata endpoint: idp/client_metadata</li>
-			<li>POST Request to the assertion endpoint: idp/assertion</li>
-		</ol>
+    <div style="text-align: center">
+        <h1>Relying Party FedCM Demo</h1>
+        <h3>
+            See the FedCM <a href="https://fedidcg.github.io/FedCM/">Specification</a>
+        </h3>
+    </div>
 
-		<div style="text-align: center">
-           <!-- <iframe src="http://idp.localhost:8080/login-button" allow="identity-credentials-get">
-                
-            </iframe>-->
-			<button onclick="login()">Login (FedCM)</button>
-	
-		</div>
-	
-		<div id="token-inner">
-			<h4 style="text-align: center">Token Response</h4>
+    <div id="steps-outer">
+        <h4 style="text-align: center">FedCM Login Steps
+            (navigator.credentials.get())</h4>
+        <ol>
+            <li>GET Request to the well-known web identity file: .well-known/web-identity</li>
+            <li>GET Request to the config endpoint: fedcm.json</li>
+            <li>GET Request to the accounts endpoint: idp/accounts</li>
+            <li>GET Request to the metadata endpoint: idp/client_metadata</li>
+            <li>POST Request to the assertion endpoint: idp/assertion</li>
+        </ol>
 
-			<textArea id="token"></textArea>
-		</div>
-		
-	</div>
+        <div style="text-align: center">
+            <div id="login"> </div>
+            <a th:if="${authenticated == true}" href="/rp/logout">Logout</a>
+            <!-- add for active mode, remove for passive-->
+            <button th:if="${idpSelected and authenticated == 'false'}" onclick="login()" style="background-color: paleturquoise; padding : 10px">Login using <span th:text="${selectedIdP}"/></button>
+
+        </div>
+
+        <div id="token-inner">
+            <h4 th:if="${authenticated == true}">Welcome Back <span th:text="${principal}" />!</h4>
+
+            <div id="reponseDiv">
+                <h4 style="text-align: center">Token Response</h4>           
+                <textArea id="token"></textArea>
+                <h4 th:if="${samlresponse}" style="text-align: center">SAML Response</h4>
+                <textArea th:if="${samlresponse}" id="samlResponse"  style="height: 372px; width: 775px;">     
+                <span th:text="${samlresponse}"/></textArea>
+            </div> 
+
+        </div>
+
+    </div>
+
+    <form id="tokenform" action="/rp/token-callback" method="POST" }>
+        <input hidden id="tokenpost" name="tokenpost" />
+        <button hidden id="tokensubmit" type="submit" />
+    </form>
 
 
 </body>

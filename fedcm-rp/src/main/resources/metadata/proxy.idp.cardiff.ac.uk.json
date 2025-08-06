@@ -1,0 +1,5 @@
+{
+	"configURL": "http://proxy.fedcm:8081/proxy/fedcm.json",
+	"clientId": "http://rp.fedcm:8081/",
+	"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025"
+}

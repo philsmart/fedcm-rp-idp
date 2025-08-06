@@ -15,8 +15,11 @@
 package uk.ac.jisc.ti.demo.fedcm.model;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+import net.shibboleth.shared.annotation.constraint.Live;
 
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,7 +51,7 @@ public class IdentityProviderConfig {
 
     private final String responseType;
 
-    private final Map<String, String> params;
+    @Nonnull @Live private final Map<String, String> params;
     
     private final boolean registered;
 
@@ -57,7 +62,11 @@ public class IdentityProviderConfig {
         this.loginHint = builder.loginHint;
         this.scope = builder.scope;
         this.responseType = builder.responseType;
-        this.params = builder.params;
+        if (builder.params == null || builder.params.isEmpty()) {
+    		this.params = new HashMap<>(0);
+    	} else {
+    		this.params = builder.params;
+    	}        
         this.registered = builder.registered;
     }
     
@@ -103,7 +112,7 @@ public class IdentityProviderConfig {
 
     @JsonProperty("params")
     @JsonInclude(Include.NON_EMPTY)
-    public Map<String, String> getParams() {
+    @Live public Map<String, String> getParams() {    	
         return params;
     }
 

@@ -5,7 +5,7 @@
    "name": "Jim Kirk",
    "email": "jim.kirk@idp.example",
    "picture": "http://idp.localhost:8080/images/kirk.ico",
-   "approved_clients": ["123", "456", "789"],
+   "approved_clients": ["nope"],
    "login_hints": ["jim_kirk"]
   }]
 }

@@ -16,10 +16,12 @@ package uk.ac.jisc.ti.demo.fedcm.idp.controller;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.logging.log4j.util.Base64Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,23 +47,20 @@ import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import uk.ac.jisc.ti.demo.fedcm.model.CredentialRequestOptions;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAPIConfig;
-import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccount;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderAccounts;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderBranding;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderClientMetadata;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderIcon;
 import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
-import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderWellKnown;
 
 /**
  * Mock FedCM IdP endpoints.
  */
 @Controller
 @RequestMapping("/idp")
-@CrossOrigin(origins = { "http://rp.localhost:8080",
-		"http://localhost:8080" }, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = { "http://rp.localhost:8081",
+		"http://localhost:8081", "http://rp.localhost:8080", "http://proxy.localhost:8081" }, allowedHeaders = "*", allowCredentials = "true")
 public class IdPController {
 
 	/** Logger. */
@@ -74,6 +74,9 @@ public class IdPController {
 
 	/** The loaded accounts. */
 	private final IdentityProviderAccounts accounts;
+	
+	/** An object mapper to use.*/
+	private ObjectMapper om;
 
 	/**
 	 * Constructor.
@@ -90,6 +93,7 @@ public class IdPController {
 		hostname = Objects.requireNonNull(host);
 		scheme = Objects.requireNonNull(schemeIn);
 		accounts = loadAccount(accountsFile);
+		om = new ObjectMapper();
 	}
 
 	/**
@@ -140,11 +144,9 @@ public class IdPController {
 	}
 
 	@GetMapping("/reauth")
-	public String getSigninUrlIndex(final HttpServletRequest req, Model model) {
+	public String getSigninUrlIndex(final HttpServletRequest req, Model model) throws JsonProcessingException {
 		if (hasSession(req)) {
-			final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-					+ ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-					+ ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+			final String dummyJWT = om.writeValueAsString(mintToken());
 			log.info("Signed in, redirecting back to: {}", "http://proxy.localhost:8080/proxy/acs");
 			return "redirect:http://proxy.localhost:8080/proxy/acs?token=" + dummyJWT;
 		}
@@ -222,12 +224,13 @@ public class IdPController {
 	 * 
 	 * @param req the http request
 	 * @return the IdP homepage
+	 * @throws JsonProcessingException 
 	 */
 	@GetMapping("/2fasuccess")
 	public String get2FaSuccess(final HttpServletRequest req, final HttpServletResponse resp,
 			@RequestHeader final Map<String, String> headers,
 			@RequestParam final Map<String, String> allRequestParams,
-			Model model) {
+			Model model) throws JsonProcessingException {
 		logCookiesAndHeaders(req, headers, allRequestParams);
 		IdentityProviderToken token = mintToken();
 		String tokenAsString = serialiseToken(token);
@@ -273,8 +276,10 @@ public class IdPController {
 	 * @return the API config.
 	 */
 	@GetMapping(path = "/fedcm.json", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<IdentityProviderAPIConfig> getManifest() {
+	public ResponseEntity<IdentityProviderAPIConfig> getManifest(final HttpServletRequest req,
+			@RequestHeader final Map<String, String> headers) {
 		// Dummy response
+		checkRequestValidity(req, headers, false);
 		final IdentityProviderAPIConfig config = IdentityProviderAPIConfig.builder()
 				.withAccountsEndpoint("/idp/accounts").withClientMetadataEndpoint("/idp/client_metadata")
 				.withIdAssertionEndpoint("/idp/assertion").withLoginUrl("/idp/reauth")
@@ -301,6 +306,7 @@ public class IdPController {
 
 		checkRequestValidity(req, headers, false);
 		logCookiesAndHeaders(req, headers, allRequestParams);
+		String identity = assumeIdPIdentity(headers);
 
 		if (!hasSession(req)) {
 			// Dummy response with no values
@@ -313,6 +319,19 @@ public class IdPController {
 
 			return ResponseEntity.status(HttpStatus.OK).body(accounts);
 		}
+	}
+	
+	/**
+	 * Find the assumed identity of this IdP based on the host header in the request. This is only so a single IdP can assume
+	 * multiple identities for testing.
+	 * 
+	 * @param headers the HTTP headers
+	 * @return the assumed identity.
+	 */
+	private String assumeIdPIdentity(final Map<String, String> headers) {
+		var identity = headers.get("host");
+		log.info("Assuming IdP Identity '{}'", identity);
+		return identity;
 	}
 
 	/**
@@ -397,11 +416,12 @@ public class IdPController {
 	 * @param allRequestParams the request parameters
 	 * 
 	 * @return a dummy assertion for now
+	 * @throws JsonProcessingException 
 	 */
 	@PostMapping(path = "/assertion", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<IdentityProviderToken> getAssertion(final HttpServletRequest req,
 			@RequestHeader final Map<String, String> headers,
-			@RequestParam final Map<String, String> allRequestParams) {
+			@RequestParam final Map<String, String> allRequestParams) throws JsonProcessingException {
 
 		logCookiesAndHeaders(req, headers, allRequestParams);
 		checkRequestValidity(req, headers, false);
@@ -440,11 +460,18 @@ public class IdPController {
 	 * Mint a dummy token
 	 * 
 	 * @return the minted token
+	 * @throws JsonProcessingException 
 	 */
-	private IdentityProviderToken mintToken() {
+	private IdentityProviderToken mintToken() throws JsonProcessingException {
+		
+		HashMap<String,String> claims = new HashMap<String,String>();
+		claims.put("name","phil");
+		ObjectMapper om = new ObjectMapper();
+		byte[] claimsBytesJSON = om.writeValueAsBytes(claims);
+		String base64Claims = Base64Utils.encodeToUrlSafeString(claimsBytesJSON);
 		// Dummy response
 		final String dummyJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-				+ ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+				+ "."+base64Claims
 				+ ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 		final IdentityProviderToken token = IdentityProviderToken.builder().withToken(dummyJWT).build();
 		return token;

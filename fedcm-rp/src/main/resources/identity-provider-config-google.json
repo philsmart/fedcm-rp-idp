@@ -1,0 +1,17 @@
+{"identity":{
+	"providers": [
+		{
+			"configURL": "any",
+			"clientId": "429927884003-omr9f6h07egubaq263flmgs3l7vu1q6b.apps.googleusercontent.com",
+			"nonce": "c2f39aba-b17e-4c38-93ea-34293dfde025",
+			"params" : {
+                "AuthnContextClassRef" : "http://example.org/ac/classes/mfa"
+            }
+			
+		}
+	],
+    "mode" : "widget",
+    "context": "continue"
+}}
+  
+  

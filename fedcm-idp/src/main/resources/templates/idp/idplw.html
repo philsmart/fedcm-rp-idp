@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Identity Provider FedCM Demo</title>
+    <link rel="stylesheet" href="css/style-idp.css">
+    <script src="js/idp.js" async></script>
+    
+    <script>
+        async function store() {
+        navigator.credentials.store(
+          new IdentityCredential({
+            id: "person",
+            token: JSON.stringify({user: "phil"}),
+            effectiveOrigins: ["http://rp.localhost:8080"],
+            tokenURL: "http://idp.localhost:8080/idp/assertion",
+            uiHint: {
+              name: "person",              
+              expiresAfter: 60000,
+            },
+          })).then((cred) => {
+             console.log("Stored cred " +cred);
+            })
+          ;
+       
+      };
+      
+       async function logout() {
+            navigator.credentials.store(
+          new IdentityCredential({
+            id: "green",            
+          })).then((cred) => {
+             console.log("Logged out (unregistered) cred " +cred);
+            })
+          };
+    </script>
+</head>
+
+<body style="margin: 10px">
+
+
+    <div style="text-align: center">
+        <h1>Identity Provider Lightweight FedCM Demo</h1>
+
+    </div>
+    <div id="steps-outer">
+        
+        <div class="centre">
+            <a class="button centre" onclick="store()">Sign-in</a> 
+            <hr/>
+            <a class="button centre" onclick="logout()">Logout</a>          
+            <hr/>
+            <a href="http://rp.localhost:8080/rplw">Back To RP</a>
+        </div>
+        
+    </div>
+</body>
+
+
+</html>

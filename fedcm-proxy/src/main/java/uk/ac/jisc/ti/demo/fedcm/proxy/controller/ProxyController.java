@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -56,6 +57,8 @@ import uk.ac.jisc.ti.demo.fedcm.model.IdentityProviderToken;
  */
 @Controller
 @RequestMapping("/proxy")
+@CrossOrigin(origins = { "http://rp.localhost:8081",
+		"http://localhost:8081", "http://rp.localhost:8080", "http://proxy.localhost:8081" }, allowedHeaders = "*", allowCredentials = "true")
 public class ProxyController {
 
     /** Logger. */
@@ -317,17 +320,23 @@ public class ProxyController {
         checkRequestValidity(req, headers);
         logCookiesAndHeaders(req, headers, allRequestParams);
         
-        if (!hasSession(req)) {
-        	// Dummy response with no values	
-	        log.info("No session and no accounts");      
-	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(Collections.emptyList()));
-        	
-        } else {
-	        // Dummy response	
-	        log.info("IdentityProviderAccount response: '{}'", accounts);        
-	
-	        return ResponseEntity.status(HttpStatus.OK).body(accounts);
-        }
+        // HACK FOR TESTING...
+        log.info("No session and no accounts");      
+        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(Collections.emptyList()));
+    	
+    	// HACK OVER
+        
+//        if (!hasSession(req)) {
+//        	// Dummy response with no values	
+//	        log.info("No session and no accounts");      
+//	        return ResponseEntity.status(HttpStatus.OK).body(new IdentityProviderAccounts(Collections.emptyList()));
+//        	
+//        } else {
+//	        // Dummy response	
+//	        log.info("IdentityProviderAccount response: '{}'", accounts);        
+//	
+//	        return ResponseEntity.status(HttpStatus.OK).body(accounts);
+//        }
     }
     
     /**
